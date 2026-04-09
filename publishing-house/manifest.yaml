@@ -1,0 +1,57 @@
+# RHDP Publishing House — Project Manifest
+# This file is the source of truth for project state.
+# The orchestrator reads and updates it every session.
+
+project:
+  name: ""          # Project name (e.g., "Getting Started with OpenShift")
+  id: ""            # Short identifier (e.g., "ocp-getting-started")
+  created: ""       # ISO 8601 date (YYYY-MM-DD)
+  owner: ""         # GitHub username of project owner
+  type: ""          # workshop | demo
+  autonomy: supervised  # supervised | semi | full
+
+lifecycle:
+  current_phase: intake
+  phases:
+    intake:
+      status: pending       # pending | in_progress | completed | skipped
+      completed_at: null
+      artifacts: []
+    vetting:
+      status: pending
+      completed_at: null
+      result: null           # approved | revise | rejected
+      rcars_response: null
+    spec_refinement:
+      status: pending
+      completed_at: null
+    approval:
+      status: pending
+      approved_by: null
+      completed_at: null
+    writing:
+      status: pending
+      modules: []            # Populated during intake
+      # Example module entry:
+      # - name: "Module 1: Overview"
+      #   status: pending    # pending | in_progress | drafted | approved
+    editing:
+      status: pending
+    automation:
+      status: pending
+      needs_automation: null  # true | false — asked during intake
+      substeps:
+        catalog: pending
+        environment: pending
+        grading: deferred     # Future phase
+    security_review:
+      status: pending
+    final_review:
+      status: pending
+    ready_for_publishing:
+      status: pending
+
+integrations:
+  rcars_api: null            # URL to RCARS REST API (e.g., https://rcars.apps.example.com/api/v1)
+  showroom_repo: null        # URL to public Showroom repo (set when content moves)
+  automation_repo: null      # URL to automation repo (set when created)

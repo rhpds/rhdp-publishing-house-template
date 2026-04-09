@@ -13,4 +13,3 @@
 - `publishing-house/` — Project state, specs, reviews, decisions
 - `content/` — Showroom AsciiDoc content (populated by writer agent)
 - `automation/` — Ansible/Helm automation (populated by automation agent)
-- `agnosticv/` — AgnosticV catalog config (populated by automation agent)

@@ -41,9 +41,11 @@ lifecycle:
       status: pending
       needs_automation: null  # true | false — asked during intake
       substeps:
-        catalog: pending
-        environment: pending
-        grading: deferred     # Future phase
+        catalog_item: pending       # AgnosticV catalog configuration
+        requirements: pending       # Automation requirements (reviewable scope document)
+        automation_code: pending    # Ansible collection or GitOps repo
+        testing: pending            # Deploy and verify automation works
+        e2e_checks: deferred        # End-to-end validation (future)
     security_review:
       status: pending
     final_review:

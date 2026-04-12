@@ -11,34 +11,40 @@ project:
   autonomy: supervised  # supervised | semi | full
 
 lifecycle:
-  current_phase: intake
+  current_phase: intake       # DEPRECATED — use individual phase statuses instead
   phases:
     intake:
       status: pending       # pending | in_progress | completed | skipped
       completed_at: null
+      assignees: []          # GitHub usernames working on this phase
       artifacts: []
     vetting:
       status: pending
       completed_at: null
+      assignees: []
       result: null           # approved | revise | rejected
       rcars_response: null
     spec_refinement:
       status: pending
       completed_at: null
+      assignees: []
     approval:
       status: pending
       approved_by: null
       completed_at: null
     writing:
       status: pending
+      assignees: []
       modules: []            # Populated during intake
       # Example module entry:
       # - name: "Module 1: Overview"
       #   status: pending    # pending | in_progress | drafted | approved
     editing:
       status: pending
+      assignees: []
     automation:
       status: pending
+      assignees: []
       needs_automation: null  # true | false — asked during intake
       substeps:
         catalog_item: pending       # AgnosticV catalog configuration
@@ -46,10 +52,12 @@ lifecycle:
         automation_code: pending    # Ansible collection or GitOps repo
         testing: pending            # Deploy and verify automation works
         e2e_checks: deferred        # End-to-end validation (future)
-    security_review:
+    code_security_review:            # Code review (automation) + security review (content & automation)
       status: pending
+      assignees: []
     final_review:
       status: pending
+      assignees: []
     ready_for_publishing:
       status: pending
 

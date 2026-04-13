@@ -28,6 +28,7 @@ lifecycle:
       status: pending
       completed_at: null
       assignees: []
+      artifacts: []
     approval:
       status: pending
       approved_by: null
@@ -37,29 +38,43 @@ lifecycle:
       assignees: []
       modules: []            # Populated during intake
       # Example module entry:
-      # - name: "Module 1: Overview"
+      # - id: "module-01"
+      #   title: "Module 1: Overview"
       #   status: pending    # pending | in_progress | drafted | approved
+      #   content_path: null
+      #   review_file: null
     editing:
       status: pending
+      completed_at: null
       assignees: []
+      artifacts: []
     automation:
       status: pending
       assignees: []
       needs_automation: null  # true | false — asked during intake
+      catalog_path: null      # AgnosticV catalog path
+      agv_repo: null          # AgnosticV git repo
+      agv_branch: null        # AgnosticV branch
       substeps:
         catalog_item: pending       # AgnosticV catalog configuration
         requirements: pending       # Automation requirements (reviewable scope document)
         automation_code: pending    # Ansible collection or GitOps repo
         testing: pending            # Deploy and verify automation works
         e2e_checks: deferred        # End-to-end validation (future)
+      automation_files: []    # List of automation artifact paths in this repo
     code_security_review:            # Code review (automation) + security review (content & automation)
       status: pending
+      completed_at: null
       assignees: []
+      artifacts: []
     final_review:
       status: pending
+      completed_at: null
       assignees: []
+      artifacts: []
     ready_for_publishing:
       status: pending
+      completed_at: null
 
 integrations:
   rcars_api: null            # URL to RCARS REST API (e.g., https://rcars.apps.example.com/api/v1)

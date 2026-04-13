@@ -6,7 +6,8 @@ project:
   name: ""          # Project name (e.g., "Getting Started with OpenShift")
   id: ""            # Short identifier (e.g., "ocp-getting-started")
   created: ""       # ISO 8601 date (YYYY-MM-DD)
-  owner: ""         # GitHub username of project owner
+  owner_name: ""    # Display name of project owner (e.g., "Nate Stephany")
+  owner_github: ""  # GitHub username of project owner (e.g., "stencell")
   type: ""          # workshop | demo
   autonomy: supervised  # supervised | semi | full
 
@@ -43,13 +44,8 @@ lifecycle:
       #   status: pending    # pending | in_progress | drafted | approved
       #   content_path: null
       #   review_file: null
-    editing:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    automation:
-      status: pending
+    automation:                      # Automation runs BEFORE editing — content may change
+      status: pending                #   to accommodate infrastructure, so edit once at the end
       assignees: []
       needs_automation: null  # true | false — asked during intake
       catalog_path: null      # AgnosticV catalog path
@@ -62,6 +58,11 @@ lifecycle:
         testing: pending            # Deploy and verify automation works
         e2e_checks: deferred        # End-to-end validation (future)
       automation_files: []    # List of automation artifact paths in this repo
+    editing:
+      status: pending
+      completed_at: null
+      assignees: []
+      artifacts: []
     code_security_review:            # Code review (automation) + security review (content & automation)
       status: pending
       completed_at: null

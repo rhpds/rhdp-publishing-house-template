@@ -3,7 +3,7 @@
 <!-- Experimental: human-readable session log. The manifest is the source of truth. -->
 <!-- Add entries in reverse chronological order (newest first). -->
 <!-- Format:
-## YYYY-MM-DD
+## YYYY-MM-DD HH:mm
 
 ### What was done
 - Item

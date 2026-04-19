@@ -4,12 +4,13 @@
 
 ## Getting Started
 
-1. Install the RHDP Publishing House plugin in Claude Code
-2. Run `/rhdp-publishing-house` in this directory
-3. Follow the orchestrator's guidance
+1. Install the RHDP Publishing House skills plugin in Claude Code
+2. Create your Showroom and automation repos on GitHub
+3. Run `/rhdp-publishing-house` in this directory to start intake
+4. Follow the orchestrator's guidance
 
 ## Structure
 
-- `publishing-house/` — Project state, specs, reviews, decisions
-- `content/` — Showroom AsciiDoc content (populated by writer agent)
-- `automation/` — Ansible/Helm automation (populated by automation agent)
+- `publishing-house/` — Project state (manifest), specs, reviews, decisions
+- `content/` — Showroom content repo (cloned by orchestrator, gitignored)
+- `automation/` — Automation repo (cloned by orchestrator, gitignored)

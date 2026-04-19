@@ -1,1 +1,8 @@
+# Superpowers working directories
 .superpowers/
+
+# Cloned repos (managed by orchestrator, each has its own git history)
+automation/*
+!automation/README.md
+content/*
+!content/README.md

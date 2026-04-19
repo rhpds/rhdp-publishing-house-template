@@ -1,3 +1,8 @@
+> **Maintainers:** This template is managed via submodule from
+> [rhdp-publishing-house](https://github.com/rhpds/rhdp-publishing-house).
+> Do not make changes directly to this repo — all changes should come from
+> the Publishing House dev repo.
+
 # [Project Name]
 
 <!-- Replace with your project name and brief description. -->

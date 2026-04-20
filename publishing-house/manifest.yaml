@@ -9,7 +9,7 @@ project:
   owner_name: ""    # Display name of project owner (e.g., "Jane Smith")
   owner_github: ""  # GitHub username of project owner (e.g., "jsmith")
   type: ""          # workshop | demo
-  deployment_mode: ""  # agnosticv | field_source
+  deployment_mode: ""  # onboarded | self_service
   autonomy: supervised  # supervised | semi | full
 
 lifecycle:

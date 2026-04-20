@@ -9,7 +9,7 @@ project:
   owner_name: ""    # Display name of project owner (e.g., "Jane Smith")
   owner_github: ""  # GitHub username of project owner (e.g., "jsmith")
   type: ""          # workshop | demo
-  deployment_mode: ""  # onboarded | self_service
+  deployment_mode: ""  # rhdp_published | self_published
   autonomy: supervised  # supervised | semi | full
 
 lifecycle:
@@ -54,7 +54,7 @@ lifecycle:
       agv_branch: null        # AgnosticV branch
       substeps:
         requirements: pending       # Automation requirements (reviewable scope document)
-        catalog_item: pending       # AgnosticV catalog configuration (skipped for field_source)
+        catalog_item: pending       # AgnosticV catalog configuration (skipped for self_published)
         automation_code: pending    # Ansible collection or GitOps repo
         testing: pending            # Deploy and verify automation works
         e2e_checks: deferred        # End-to-end validation (future)

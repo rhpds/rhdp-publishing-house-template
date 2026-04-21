@@ -5,17 +5,18 @@ Project state tracked in [publishing-house/manifest.yaml](publishing-house/manif
 Read it first every session.
 
 ## Repos
-- `content/` — Showroom content repo (cloned from `integrations.showroom_repo` in manifest)
-- `automation/` — Automation repo (cloned from `integrations.automation_repo` in manifest)
+- `content/` — Showroom content repo (git submodule, remote in `integrations.showroom_repo`)
+- `automation/` — Automation repo (git submodule, remote in `integrations.automation_repo`)
 
-Both are gitignored. Each has its own git history and remote.
+Each is a separate git repo. Use `git submodule update --init` to clone them after checkout.
 
 ## Spec
 Design spec in [publishing-house/spec/design.md](publishing-house/spec/design.md).
 Module outlines in [publishing-house/spec/modules/](publishing-house/spec/modules/).
 
-## Journal
-Human-readable progress in [publishing-house/journal.md](publishing-house/journal.md).
+## Worklog
+Session notes and open items in [publishing-house/worklog.yaml](publishing-house/worklog.yaml).
+Managed by the `/rhdp-publishing-house:worklog` skill.
 
 ## Invoke
 Run `/rhdp-publishing-house` to start or continue work.

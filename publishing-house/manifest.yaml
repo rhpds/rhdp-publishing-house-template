@@ -13,7 +13,7 @@ project:
   autonomy: supervised  # supervised | semi | full
 
 lifecycle:
-  current_phase: intake       # DEPRECATED — use individual phase statuses instead
+  current_phase: intake       # The phase currently being worked on
   phases:
     intake:
       status: pending       # pending | in_progress | completed | skipped

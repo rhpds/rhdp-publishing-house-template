@@ -10,12 +10,13 @@
 ## Getting Started
 
 1. Install the RHDP Publishing House skills plugin in Claude Code
-2. Create your Showroom and automation repos on GitHub
-3. Run `/rhdp-publishing-house` in this directory to start intake
-4. Follow the orchestrator's guidance
+2. Run `/rhdp-publishing-house` in this directory to start intake
+3. Follow the orchestrator's guidance
 
 ## Structure
 
+- `content/` — Showroom AsciiDoc content (Antora modules)
+- `automation/` — Automation code (Ansible roles, Helm charts)
 - `publishing-house/` — Project state (manifest), specs, reviews, decisions
-- `content/` — Showroom content repo (cloned by orchestrator, gitignored)
-- `automation/` — Automation repo (cloned by orchestrator, gitignored)
+- `site.yml` — Antora playbook (Showroom build config)
+- `ui-config.yml` — Showroom UI layout config

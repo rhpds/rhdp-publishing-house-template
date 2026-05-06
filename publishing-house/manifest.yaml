@@ -80,6 +80,4 @@ lifecycle:
 
 integrations:
   rcars_api: null            # URL to RCARS REST API (e.g., https://rcars.apps.example.com/api/v1)
-  showroom_repo: null        # SSH URL to Showroom repo (e.g., git@github.com:rhpds/zt-my-project.git)
-  automation_repo: null      # SSH URL to automation repo (e.g., git@github.com:rhpds/my-project-automation.git)
   field_source_ci: null      # AgnosticV CI path for field_source mode (e.g., agd_v2/ocp-field-asset-cnv)

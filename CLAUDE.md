@@ -4,11 +4,12 @@
 Project state tracked in [publishing-house/manifest.yaml](publishing-house/manifest.yaml).
 Read it first every session.
 
-## Repos
-- `content/` — Showroom content repo (git submodule, remote in `integrations.showroom_repo`)
-- `automation/` — Automation repo (git submodule, remote in `integrations.automation_repo`)
+## Content
+Showroom AsciiDoc content lives in [content/](content/). The Antora component descriptor
+is at `content/antora.yml` and modules are in `content/modules/ROOT/pages/`.
 
-Each is a separate git repo. Use `git submodule update --init` to clone them after checkout.
+## Automation
+Automation code (Ansible roles, Helm charts) lives in [automation/](automation/).
 
 ## Spec
 Design spec in [publishing-house/spec/design.md](publishing-house/spec/design.md).

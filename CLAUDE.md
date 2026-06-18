@@ -11,6 +11,11 @@ is at `content/antora.yml` and modules are in `content/modules/ROOT/pages/`.
 ## Automation
 Automation code (Ansible roles, Helm charts) lives in [automation/](automation/).
 
+## Zero-Touch Automation
+Zero-Touch (ZT) projects use [runtime/](runtime/) for runtime automation and
+[setup/](setup/) for setup automation. These directories are removed by the
+orchestrator for classic Showroom projects during intake.
+
 ## Spec
 Design spec in [publishing-house/spec/design.md](publishing-house/spec/design.md).
 Module outlines in [publishing-house/spec/modules/](publishing-house/spec/modules/).

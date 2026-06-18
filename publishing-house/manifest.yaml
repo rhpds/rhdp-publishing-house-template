@@ -9,6 +9,7 @@ project:
   owner_name: ""    # Display name of project owner (e.g., "Jane Smith")
   owner_github: ""  # GitHub username of project owner (e.g., "jsmith")
   type: ""          # workshop | demo
+  showroom_type: ""  # classic | zero_touch
   deployment_mode: ""  # rhdp_published | self_published
   autonomy: supervised  # supervised | semi | full
 

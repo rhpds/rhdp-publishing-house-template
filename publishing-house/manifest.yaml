@@ -6,8 +6,7 @@ project:
   name: ""          # Project name (e.g., "Getting Started with OpenShift")
   id: ""            # Short identifier (e.g., "ocp-getting-started")
   created: ""       # ISO 8601 date (YYYY-MM-DD)
-  owner_name: ""    # Display name of project owner (e.g., "Jane Smith")
-  owner_github: ""  # GitHub username of project owner (e.g., "jsmith")
+  owner_github: ""  # GitHub username (e.g., "jsmith")
   owner_email: ""   # Red Hat SSO email (e.g., "jsmith@redhat.com")
   type: ""          # workshop | demo
   showroom_type: ""  # classic | zero_touch

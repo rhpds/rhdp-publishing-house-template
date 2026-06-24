@@ -8,6 +8,7 @@ project:
   created: ""       # ISO 8601 date (YYYY-MM-DD)
   owner_name: ""    # Display name of project owner (e.g., "Jane Smith")
   owner_github: ""  # GitHub username of project owner (e.g., "jsmith")
+  owner_email: ""   # Red Hat SSO email (e.g., "jsmith@redhat.com")
   type: ""          # workshop | demo
   showroom_type: ""  # classic | zero_touch
   deployment_mode: ""  # rhdp_published | self_published
@@ -58,14 +59,23 @@ lifecycle:
         catalog_item: pending       # AgnosticV catalog configuration (skipped for self_published)
         automation_code: pending    # Ansible collection or GitOps repo
         testing: pending            # Deploy and verify automation works
-        e2e_checks: deferred        # End-to-end validation (future)
       automation_files: []    # List of automation artifact paths in this repo
     editing:
       status: pending
       completed_at: null
       assignees: []
       artifacts: []
-    code_security_review:            # Code review (automation) + security review (content & automation)
+    code_review:
+      status: pending
+      completed_at: null
+      assignees: []
+      artifacts: []
+    security_review:
+      status: pending
+      completed_at: null
+      assignees: []
+      artifacts: []
+    e2e_testing:
       status: pending
       completed_at: null
       assignees: []
@@ -79,6 +89,4 @@ lifecycle:
       status: pending
       completed_at: null
 
-integrations:
-  rcars_api: null            # URL to RCARS REST API (e.g., https://rcars.apps.example.com/api/v1)
-  field_source_ci: null      # AgnosticV CI path for field_source mode (e.g., agd_v2/ocp-field-asset-cnv)
+integrations: {}

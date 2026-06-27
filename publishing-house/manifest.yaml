@@ -88,4 +88,6 @@ lifecycle:
       status: pending
       completed_at: null
 
-integrations: {}
+integrations:
+  jira:
+    enabled: false

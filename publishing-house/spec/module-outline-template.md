@@ -57,16 +57,13 @@ The intake agent uses this format when generating your design and module outline
 ### Audience and Time
 <!-- Target personas, prerequisites for this module, estimated duration. -->
 
-### What You Will See, Learn, and Do
-
-**See:**
-- <!-- What the learner will observe -->
-
-**Learn:**
-- <!-- Concepts the learner will understand -->
-
-**Do:**
-- <!-- Hands-on activities the learner will perform -->
+### Learning Objectives
+<!-- Module-level learning objectives. These should map back to one or more
+     of the design spec's consolidated objectives, expanded with module-specific
+     detail. Use action verbs (Deploy, Configure, Troubleshoot, etc.).
+     Bulleted list. -->
+- <!-- Objective 1 -->
+- <!-- Objective 2 -->
 
 ### Lab Structure
 <!-- Named sections with time estimates.

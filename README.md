@@ -17,8 +17,8 @@
 
 - `content/` — Showroom AsciiDoc content (Antora modules)
 - `automation/` — Automation code (Ansible roles, Helm charts)
-- `runtime/` — Zero-Touch runtime automation (removed for classic Showroom projects)
-- `setup/` — Zero-Touch setup automation (removed for classic Showroom projects)
+- `runtime-automation/` — Zero-Touch runtime automation (removed for classic Showroom projects)
+- `setup-automation/` — Zero-Touch setup automation (removed for classic Showroom projects)
 - `publishing-house/` — Project state (manifest), specs, reviews, decisions
 - `site.yml` — Antora playbook (Showroom build config)
 - `ui-config.yml` — Showroom UI layout config

@@ -35,6 +35,12 @@ Run compliance check when asked:
 python ph-check.py
 ```
 
+## Zero-Touch Automation
+
+Zero-Touch (ZT) projects use [runtime-automation/](runtime-automation/) for runtime automation and
+[setup-automation/](setup-automation/) for setup automation. These directories are removed by the
+orchestrator for classic Showroom projects during intake.
+
 ## Stage: review or ready
 
 Show the author the current spec or compliance results and wait for instruction.

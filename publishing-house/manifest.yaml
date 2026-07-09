@@ -1,93 +1,35 @@
-# RHDP Publishing House — Project Manifest
-# This file is the source of truth for project state.
-# The orchestrator reads and updates it every session.
+# Publishing House — Project Manifest
+# 4-stage lifecycle: intake → review → development → ready
+# No secrets in this file. Tokens live in ~/.config/publishing-house/auth.json
 
 project:
-  name: ""          # Project name (e.g., "Getting Started with OpenShift")
-  id: ""            # Short identifier (e.g., "ocp-getting-started")
-  created: ""       # ISO 8601 date (YYYY-MM-DD)
-  owner_github: ""  # GitHub username (e.g., "jsmith")
-  owner_email: ""   # Red Hat SSO email (e.g., "jsmith@redhat.com")
-  type: ""          # workshop | demo
-  showroom_type: ""  # classic | zero_touch
-  deployment_mode: ""  # rhdp_published | self_published
-  autonomy: guided  # guided | assisted | autonomous
+  slug: ""                  # Short identifier (e.g., "ocp-getting-started")
+  jira_ticket: ""           # RHDPCD-NNN
+  content_type: ""          # lab | demo | workshop | onboarding
+  initiative_key: ""        # e.g., summit-2027
+  reviewer_email: ""        # Who reviews the spec at the Review gate
+  deployment_mode: ""       # rhdp_published | self_published
 
-lifecycle:
-  current_phase: intake       # The phase currently being worked on
-  phases:
-    intake:
-      status: pending       # pending | in_progress | completed | skipped
-      completed_at: null
-      assignees: []          # GitHub usernames working on this phase
-      artifacts: []
-    vetting:
-      status: pending
-      completed_at: null
-      assignees: []
-      result: null           # approved | revise | rejected
-      rcars_response: null
-    spec_refinement:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    approval:
-      status: pending
-      approved_by: null
-      completed_at: null
-    writing:
-      status: pending
-      assignees: []
-      modules: []            # Populated during intake
-      # Example module entry:
-      # - id: "module-01"
-      #   title: "Module 1: Overview"
-      #   status: pending    # pending | in_progress | drafted | approved
-      #   content_path: null
-      #   review_file: null
-    automation:                      # Automation runs BEFORE editing — content may change
-      status: pending                #   to accommodate infrastructure, so edit once at the end
-      assignees: []
-      needs_automation: null  # true | false — asked during intake
-      catalog_path: null      # AgnosticV catalog path
-      agv_repo: null          # AgnosticV git repo
-      agv_branch: null        # AgnosticV branch
-      substeps:
-        requirements: pending       # Automation requirements (reviewable scope document)
-        catalog_item: pending       # AgnosticV catalog configuration (skipped for self_published)
-        automation_code: pending    # Ansible collection or GitOps repo
-        testing: pending            # Deploy and verify automation works
-      automation_files: []    # List of automation artifact paths in this repo
-    editing:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    code_review:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    security_review:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    e2e_testing:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    final_review:
-      status: pending
-      completed_at: null
-      assignees: []
-      artifacts: []
-    ready_for_publishing:
-      status: pending
-      completed_at: null
+stage:
+  current: intake           # intake | review | development | ready | published
+  entered_at: ""
 
-integrations:
-  jira:
-    enabled: false
+gates: []
+
+spec:
+  title: ""
+  learning_objectives: []
+  modules: []
+  environment:
+    ocp_version: ""
+    topology: ""            # shared-cluster | per-student | cnv-pool
+  duration_hours: null
+  audience: ""              # beginner | intermediate | advanced
+
+compliance:
+  last_hard_check: null
+  hard_result: null
+
+tracking:
+  paused: false
+  pause_reason: null

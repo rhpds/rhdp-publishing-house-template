@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'STAGE=$(grep -E \"^  current:\" publishing-house/manifest.yaml 2>/dev/null | head -1 | sed \"s/.*current://\" | tr -d \" \"); [ -n \"$STAGE\" ] && echo \"PH PROJECT CONTEXT: This is a Publishing House project in stage=[$STAGE]. If you have a routing menu, skip it. Follow the Stage instructions in CLAUDE.md immediately.\" || true'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/pre-tool-use.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

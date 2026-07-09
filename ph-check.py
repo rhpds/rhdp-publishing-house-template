@@ -27,7 +27,7 @@ except ImportError:
 
 CENTRAL_URL = os.environ.get(
     "PH_CENTRAL_URL",
-    "https://ph-central.apps.cluster-v27ps.dynamic2.redhatworkshops.io"
+    "https://ph-api.apps.cluster-v27ps.dynamic2.redhatworkshops.io"
 )
 CACHE_DIR = Path.home() / ".cache" / "ph-check"
 CACHE_TTL_HOURS = 24

@@ -39,13 +39,13 @@ spec:
     duration_min: 35
   title: AI Agent Troubleshooting on OpenShift
 stage:
-  current: intake
-  entered_at: ''
+  current: development
+  entered_at: '2026-07-10 06:54'
 tracking:
   pause_reason: null
   paused: false
 lifecycle:
-  current_phase: intake
+  current_phase: development
   phases:
     intake:
       status: completed

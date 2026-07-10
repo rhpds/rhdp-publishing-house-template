@@ -60,7 +60,8 @@ def get_project_id():
         ).stdout.strip()
         if repo_url.startswith("git@github.com:"):
             repo_url = "https://github.com/" + repo_url[len("git@github.com:"):]
-        repo_url = repo_url.rstrip(".git")
+        if repo_url.endswith(".git"):
+            repo_url = repo_url[:-4]
     except Exception:
         return None
 

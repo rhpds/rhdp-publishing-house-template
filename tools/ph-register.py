@@ -49,7 +49,9 @@ def get_repo_url():
             url = result.stdout.strip()
             if url.startswith("git@github.com:"):
                 url = "https://github.com/" + url[len("git@github.com:"):]
-            return url.rstrip(".git")
+            if url.endswith(".git"):
+                url = url[:-4]
+            return url
     except Exception:
         pass
     return None

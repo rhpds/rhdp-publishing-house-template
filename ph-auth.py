@@ -13,8 +13,8 @@ Usage:
 import argparse
 import json
 import os
+import subprocess
 import sys
-import webbrowser
 from pathlib import Path
 
 CENTRAL_URL = os.environ.get(
@@ -80,7 +80,13 @@ def main() -> None:
 
     if not args.paste:
         print(f"🔑 Opening Publishing House portal...")
-        webbrowser.open(KEYS_PAGE)
+        try:
+            subprocess.Popen(["open", KEYS_PAGE])  # macOS
+        except FileNotFoundError:
+            try:
+                subprocess.Popen(["xdg-open", KEYS_PAGE])  # Linux
+            except Exception:
+                print(f"   Could not open browser. Visit manually: {KEYS_PAGE}")
 
     raw_key = _prompt_paste()
     _save(raw_key)

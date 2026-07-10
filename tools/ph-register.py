@@ -81,7 +81,28 @@ def main():
         sys.exit(2)
 
     branch = get_branch()
-    payload = json.dumps({"repo_url": repo_url, "branch": branch}).encode()
+
+    # Read name + deployment_mode from local manifest (avoids Central reading from GitHub)
+    local_name = None
+    local_mode = None
+    try:
+        manifest_path = Path("publishing-house/manifest.yaml")
+        if manifest_path.exists():
+            import yaml
+            m = yaml.safe_load(manifest_path.read_text())
+            proj = m.get("project", {})
+            local_name = proj.get("name") or proj.get("slug") or None
+            local_mode = proj.get("deployment_mode") or None
+    except Exception:
+        pass
+
+    body = {"repo_url": repo_url, "branch": branch}
+    if local_name:
+        body["name"] = local_name
+    if local_mode:
+        body["deployment_mode"] = local_mode
+
+    payload = json.dumps(body).encode()
     req = urllib.request.Request(
         f"{CENTRAL_URL}/api/v1/projects",
         data=payload,

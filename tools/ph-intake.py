@@ -182,9 +182,12 @@ def main():
             data = json.loads(r.read().decode())
             epic_key = data.get("epic_key", "")
             jira_url = data.get("jira_url", "")
-            print(f"✅ Jira Epic created: {epic_key}")
-            print(f"   {jira_url}")
-            print(f"   Tasks created for {len(payload['modules'])} modules + automation + health check + e2e")
+            if epic_key:
+                print(f"✅ Jira Epic created: {epic_key}")
+                print(f"   {jira_url}")
+                print(f"   Tasks created for {len(payload['modules'])} modules + automation + health check + e2e")
+            else:
+                print("✅ Intake spec submitted to Central (self-published — no Jira tracking)")
     except urllib.error.HTTPError as e:
         body = e.read().decode()[:300]
         print(f"ERROR: Central returned {e.code}: {body}", file=sys.stderr)

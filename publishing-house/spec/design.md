@@ -1,70 +1,62 @@
-# [Project Title]
-
-<!-- This file is populated by the intake agent during the intake phase. -->
-<!-- Run /rhdp-publishing-house to get started, or fill in the sections below manually. -->
+# AI Agent Troubleshooting on OpenShift
 
 ## Problem Statement
 
-[What gap does this fill? Who has this problem and why can't they solve it today? 2-3 sentences, specific — reference a real persona with a real need.]
+Platform engineers spend significant time manually correlating logs, events, and resource metrics when OpenShift applications fail. Traditional CLI-based troubleshooting requires expertise across multiple tools and is slow when the root cause is non-obvious. AI-powered troubleshooting agents built with LangGraph and Red Hat OpenShift AI can interpret cluster state holistically and surface root causes faster, but most platform engineers lack a practical on-ramp to building and using these agents with Red Hat tooling.
 
 ## Target Audience
 
-- **Role:** [Data scientists, platform engineers, developers, etc.]
-- **Experience level:** [Beginner, intermediate, or advanced]
-- **What they already know:** [Existing skills and knowledge]
-- **What they don't know:** [Skills this workshop teaches]
-- **Prerequisites:** [What they need before starting]
+- **Role:** Platform engineers
+- **Experience level:** Intermediate
+- **What they already know:** OpenShift day-2 operations, oc CLI, pod and event debugging, basic understanding of what LLMs do
+- **What they don't know:** Building LangGraph agents, connecting AI model endpoints to operator tooling, agent-driven troubleshooting workflows
+- **Prerequisites:** Familiarity with OpenShift (oc CLI, namespaces, pods, events); no prior agent development experience required
 
 ## Learning Objectives
 
-1. [Action verb] [specific, measurable outcome]
-2. [Action verb] [specific, measurable outcome]
-3. [Action verb] [specific, measurable outcome]
-
-<!-- 3-7 objectives. Start with action verbs: Configure, Deploy, Create, Implement, Troubleshoot, Monitor, Scale. Each should be testable. NOT: Understand, Learn, Know. -->
+1. Configure a LangGraph troubleshooting agent connected to Red Hat OpenShift AI
+2. Diagnose CrashLoopBackOff and pod failure root causes using the AI agent
+3. Identify resource exhaustion patterns across namespaces through agent-driven cluster investigation
+4. Trace networking misconfigurations using agent tool calls against live OpenShift APIs
 
 ## Content Type
 
-[Workshop (hands-on) or Demo (presenter-led)]
+Lab (hands-on)
 
 ## Products & Technologies
 
-- [Official Red Hat product name with version if relevant]
-- [Additional products/technologies]
-
-<!-- Use official names: "Red Hat OpenShift", not "OpenShift". List upstream projects separately. -->
+- Red Hat OpenShift 4.21
+- Red Hat OpenShift AI (RHOAI)
+- LangGraph (upstream)
 
 ## Module Map
 
 | Module | Title | Duration |
 |--------|-------|----------|
-| 1 | [Module title] | [XX min] |
-| 2 | [Module title] | [XX min] |
-| — | **Total hands-on** | **[X hours]** |
-| — | Intro / presentation | [~XX min] |
-| — | **Total workshop** | **[~X hours]** |
+| 1 | Build Your First OpenShift Troubleshooting Agent | ~25 min |
+| 2 | Diagnosing Pod Failures and CrashLoopBackOff | ~30 min |
+| 3 | Resource Exhaustion and Networking Investigation | ~35 min |
+| — | **Total hands-on** | **~90 min** |
+| — | Intro / presentation | ~10 min |
+| — | **Total lab** | **~100 min** |
 
-<!-- Each module 10-30 min. Total: workshop 1-4 hours, demo 15-45 min. Modules should build on each other. -->
+**Module relationship:** Sequential — modules build on each other. Module 1 provisions and configures the agent; Modules 2 and 3 require the agent to be running and connected.
 
 ## Difficulty Level
 
-[Beginner, Intermediate, or Advanced]
+Intermediate
 
 ## Environment
 
-**Learner view:** [What exists when the lab starts — pre-deployed resources, what participants see and interact with. Be specific about cluster details.]
+**Learner view:** Students arrive to an OCP 4.21 shared cluster with Red Hat OpenShift AI already installed and a model serving endpoint active. A sample application is pre-deployed in their namespace with intentional faults seeded per scenario — CrashLoopBackOff, resource exhaustion, and networking misconfiguration. Participants configure and use the LangGraph agent against this broken environment; no cluster installs required.
 
-**Automation needed:** [Yes/No]
-
-[If yes, list what automation must provision — operators, per-user resources, sample apps, data sets.]
+**Automation needed:** Yes — RHOAI Operator and model serving endpoint provisioned at cluster startup; broken sample application deployed per student namespace with fault scenarios injected (pod failure, resource pressure, network misconfiguration).
 
 ## Infrastructure Requirements
 
-- **Base infrastructure:** [Base CI type: ocp4-cluster, ocp-workloads, cloud-vms-base, or existing CI name]
-- **Sizing:** [Node types and counts with resources — e.g., "3 masters (4 CPU, 16GB RAM), 6 workers (8 CPU, 32GB RAM, 100GB disk)"]
-- **Cloud provider:** [CNV (default), AWS, GCP, Azure]
-- **Automation approach:** [Ansible, GitOps (Helm + ArgoCD), or combo]
-- **Existing workloads to reuse:** [AgnosticD workloads, GitOps repos, Ansible collections — or "None"]
-- **New workloads needed:** [What needs to be developed — or "None"]
-
-<!-- Not all fields must be known at intake. "TBD, estimating ~X" is fine. Spec refinement fills gaps. -->
+- **Base infrastructure:** ocp4-cluster
+- **Sizing:** 3 control plane nodes (4 CPU, 16GB RAM), 4 worker nodes (8 CPU, 32GB RAM, 100GB disk), 1 GPU worker node (A10G or equivalent, 16 vCPU, 64GB RAM) for RHOAI model serving — TBD, exact sizing pending multi-user load estimation
+- **Cloud provider:** CNV
+- **Automation approach:** Ansible
+- **Existing workloads to reuse:** RHOAI Operator AgnosticD workload (ocp4_workload_rhods or current equivalent)
+- **New workloads needed:** Broken sample application with seeded fault scenarios (CrashLoopBackOff, resource pressure, network misconfiguration) — to be developed by lab owner

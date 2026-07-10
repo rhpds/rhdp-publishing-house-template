@@ -33,7 +33,7 @@ def get_api_key():
     if auth_file.exists():
         try:
             data = json.loads(auth_file.read_text())
-            return data.get("api_key") or data.get("token")
+            return data.get("credential") or data.get("api_key") or data.get("token")
         except Exception:
             pass
     return None
@@ -72,8 +72,7 @@ def main():
     api_key = get_api_key()
     if not api_key:
         print("ERROR: No PH API key found.", file=sys.stderr)
-        print("Ask your admin for a personal key and add it to ~/.bashrc:", file=sys.stderr)
-        print("  echo 'export PH_API_KEY=<your-key>' >> ~/.bashrc && source ~/.bashrc", file=sys.stderr)
+        print("Generate one at the portal and run: python ph-auth.py --paste", file=sys.stderr)
         sys.exit(2)
 
     repo_url = get_repo_url()

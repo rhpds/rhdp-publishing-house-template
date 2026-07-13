@@ -95,13 +95,15 @@ def get_policy(key, endpoint, offline=False):
 
 
 def load_manifest():
-    path = Path("publishing-house/manifest.yaml")
-    if not path.exists():
-        return None, "publishing-house/manifest.yaml not found"
-    try:
-        return yaml.safe_load(path.read_text()), None
-    except Exception as e:
-        return None, f"manifest.yaml parse error: {e}"
+    # spec.yaml is the new name (renamed from manifest.yaml)
+    for candidate in ["publishing-house/spec.yaml", "publishing-house/manifest.yaml"]:
+        path = Path(candidate)
+        if path.exists():
+            try:
+                return yaml.safe_load(path.read_text()), None
+            except Exception as e:
+                return None, f"{candidate} parse error: {e}"
+    return None, "publishing-house/spec.yaml not found"
 
 
 def run_checks(offline=False, verbose=False):
@@ -202,8 +204,75 @@ def run_checks(offline=False, verbose=False):
     else:
         record("learning-objectives", "SKIP", "No content yet")
 
+    # ── Nate's Part 1 checks (RHDPCD-170) ────────────────────────────────────
+
+    # Check 8: Vocabulary — content_type
+    content_type = manifest.get("project", {}).get("content_type", "")
+    valid_content_types = {"lab", "demo", "workshop", "onboarding"}
+    if content_type:
+        if content_type.lower() in valid_content_types:
+            record("content-type", "PASS", f"Content type '{content_type}' is valid")
+        else:
+            record("content-type", "FAIL",
+                   f"Content type '{content_type}' is not valid. Must be one of: {', '.join(sorted(valid_content_types))}")
+    else:
+        record("content-type", "SKIP", "Content type not set in spec yet")
+
+    # Check 9: Vocabulary — deployment_mode
+    deployment_mode = manifest.get("project", {}).get("deployment_mode", "")
+    valid_modes = {"onboarded", "self_published", "rhdp_published"}
+    if deployment_mode:
+        if deployment_mode.lower() in valid_modes:
+            record("deployment-mode", "PASS", f"Deployment mode '{deployment_mode}' is valid")
+        else:
+            record("deployment-mode", "FAIL",
+                   f"Deployment mode '{deployment_mode}' is not valid. Must be: onboarded or self_published")
+    else:
+        record("deployment-mode", "SKIP", "Deployment mode not set in spec yet")
+
+    # Check 10: Module spec sections — required headings per module outline
+    modules_dir = Path("publishing-house/spec/modules")
+    required_sections = ["Brief Overview", "Audience", "Learning Objectives", "Lab Structure", "Key Takeaways"]
+    if modules_dir.exists():
+        module_files = sorted(modules_dir.glob("module-*.md"))
+        if module_files:
+            all_ok = True
+            for mf in module_files:
+                content = mf.read_text()
+                missing = [s for s in required_sections if s.lower() not in content.lower()]
+                if missing:
+                    record("module-sections", "FAIL",
+                           f"{mf.name}: missing required sections: {', '.join(missing)}")
+                    all_ok = False
+            if all_ok:
+                record("module-sections", "PASS",
+                       f"All {len(module_files)} module outlines have required sections")
+        else:
+            record("module-sections", "SKIP", "No module outlines written yet")
+    else:
+        record("module-sections", "SKIP", "No spec/modules directory yet")
+
+    # Check 11: Template placeholders — detect unfilled template text
+    import re
+    placeholder_pattern = re.compile(r"\[PLACEHOLDER\]|\[TODO\]|PLACEHOLDER_HERE|REPLACE_ME|<.*?>", re.IGNORECASE)
+    spec_dir = Path("publishing-house/spec")
+    if spec_dir.exists():
+        placeholder_files = []
+        for spec_file in spec_dir.rglob("*.md"):
+            if placeholder_pattern.search(spec_file.read_text()):
+                placeholder_files.append(spec_file.name)
+        if placeholder_files:
+            record("no-placeholders", "FAIL",
+                   f"Template placeholders found in: {', '.join(placeholder_files[:3])}")
+        else:
+            record("no-placeholders", "PASS", "No unfilled template placeholders detected")
+    else:
+        record("no-placeholders", "SKIP", "No spec files yet")
+
+    # ── Summary ───────────────────────────────────────────────────────────────
     print()
     print("─" * 50)
+    total = passed + failed + warned + skipped
     print(f"Results: {passed} passed, {failed} failed, {warned} warned, {skipped} skipped")
     if failed > 0:
         print("❌ Compliance check FAILED")
@@ -225,7 +294,7 @@ def main():
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
-    if not Path("publishing-house/manifest.yaml").exists():
+    if not (Path("publishing-house/spec.yaml").exists() or Path("publishing-house/manifest.yaml").exists()):
         print("ERROR: Run from a Publishing House project directory.", file=sys.stderr)
         sys.exit(2)
 

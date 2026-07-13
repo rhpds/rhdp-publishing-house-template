@@ -1,20 +1,23 @@
-# Publishing House — Project Manifest
+# Publishing House — Project Spec
 # 4-stage lifecycle: intake → review → development → ready
 # No secrets in this file. Tokens live in ~/.config/publishing-house/auth.json
+# Stage is managed by SonataFlow and cached in .ph-state — do not edit stage.current manually.
 
 project:
-  slug: ""                  # Short identifier (e.g., "ocp-getting-started")
-  jira_ticket: ""           # RHDPCD-NNN
+  slug: ""                  # Short identifier (e.g., "ocp-getting-started") — set by skill
+  owner_email: ""           # Author Red Hat SSO email — set by skill after registration
   content_type: ""          # lab | demo | workshop | onboarding
+  deployment_mode: ""       # rhdp_published | self_published — set by skill after registration
+  jira_ticket: ""           # RHDPCD-NNN (rhdp_published only)
   initiative_key: ""        # e.g., summit-2027
-  reviewer_email: ""        # Who reviews the spec at the Review gate
-  deployment_mode: ""       # rhdp_published | self_published
+  reviewer_email: ""        # Who reviews the spec at the Review gate (rhdp_published only)
+  showroom_type: ""         # classic | zero_touch — set by intake sub-skill
 
 stage:
+  # NOTE: Stage is owned by SonataFlow and read by the skill from .ph-state via the
+  # orchestrator-state API. This field is kept for reference only and is not authoritative.
   current: intake           # intake | review | development | ready | published
   entered_at: ""
-
-gates: []
 
 spec:
   title: ""

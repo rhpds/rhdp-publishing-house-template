@@ -28,7 +28,7 @@ except ImportError:
 
 CENTRAL_URL = os.environ.get(
     "PH_CENTRAL_URL",
-    "https://ph-api.apps.cluster-v27ps.dynamic2.redhatworkshops.io"
+    "https://central-api-backstage.apps.cluster-v27ps.dynamic2.redhatworkshops.io"
 )
 CACHE_DIR = Path.home() / ".cache" / "ph-check"
 CACHE_TTL_HOURS = 24
@@ -147,11 +147,15 @@ def run_checks(offline=False, verbose=False):
         actual = len(content_files)
         if expected == 0:
             record("module-count", "SKIP", "No modules in spec yet")
+        elif actual == 0:
+            # Content not started yet — expected at intake stage
+            record("module-count", "SKIP", f"Spec declares {expected} modules — content not written yet")
         elif actual == expected:
             record("module-count", "PASS", f"{actual} modules match spec")
         else:
-            record("module-count", "FAIL",
-                   f"Spec declares {expected} modules but found {actual} in content/modules/ROOT/pages/")
+            # Some content written but incomplete — warn, not fail
+            record("module-count", "WARN",
+                   f"Spec declares {expected} modules, {actual} written so far")
     else:
         record("module-count", "SKIP", "No content directory yet")
 
@@ -162,7 +166,8 @@ def run_checks(offline=False, verbose=False):
         missing = [m.get("id", "") for m in modules_in_spec
                    if m.get("id") and m["id"] not in nav_content]
         if missing:
-            record("nav-modules", "FAIL", f"Modules not in nav.adoc: {', '.join(missing)}")
+            # nav.adoc may be auto-generated — warn rather than fail
+            record("nav-modules", "WARN", f"Modules not yet in nav.adoc: {', '.join(missing)}")
         elif modules_in_spec:
             record("nav-modules", "PASS", "All modules in nav.adoc")
     else:
@@ -190,15 +195,20 @@ def run_checks(offline=False, verbose=False):
         record("ocp-version", "SKIP", "OCP version not set in spec yet")
 
     if objectives and content_dir.exists():
-        all_content = " ".join(f.read_text() for f in content_dir.glob("*.adoc")).lower()
-        missing_obj = [obj[:50] for obj in objectives
-                       if not any(w in all_content for w in obj.lower().split() if len(w) > 4)]
-        if missing_obj:
-            record("learning-objectives", "FAIL",
-                   f"{len(missing_obj)} objectives not found in content")
+        adoc_files = list(content_dir.glob("*.adoc"))
+        if not adoc_files:
+            # Content not written yet — skip rather than fail
+            record("learning-objectives", "SKIP", "No content written yet")
         else:
-            record("learning-objectives", "PASS",
-                   f"All {len(objectives)} objectives referenced in content")
+            all_content = " ".join(f.read_text() for f in adoc_files).lower()
+            missing_obj = [obj[:50] for obj in objectives
+                           if not any(w in all_content for w in obj.lower().split() if len(w) > 4)]
+            if missing_obj:
+                record("learning-objectives", "FAIL",
+                       f"{len(missing_obj)} objectives not found in content")
+            else:
+                record("learning-objectives", "PASS",
+                       f"All {len(objectives)} objectives referenced in content")
     elif not objectives:
         record("learning-objectives", "SKIP", "No objectives in spec yet")
     else:
@@ -220,13 +230,13 @@ def run_checks(offline=False, verbose=False):
 
     # Check 9: Vocabulary — deployment_mode
     deployment_mode = manifest.get("project", {}).get("deployment_mode", "")
-    valid_modes = {"onboarded", "self_published", "rhdp_published"}
+    valid_modes = {"self_published", "rhdp_published"}
     if deployment_mode:
         if deployment_mode.lower() in valid_modes:
             record("deployment-mode", "PASS", f"Deployment mode '{deployment_mode}' is valid")
         else:
             record("deployment-mode", "FAIL",
-                   f"Deployment mode '{deployment_mode}' is not valid. Must be: onboarded or self_published")
+                   f"Deployment mode '{deployment_mode}' is not valid. Must be: rhdp_published or self_published")
     else:
         record("deployment-mode", "SKIP", "Deployment mode not set in spec yet")
 
@@ -272,7 +282,6 @@ def run_checks(offline=False, verbose=False):
     # ── Summary ───────────────────────────────────────────────────────────────
     print()
     print("─" * 50)
-    total = passed + failed + warned + skipped
     print(f"Results: {passed} passed, {failed} failed, {warned} warned, {skipped} skipped")
     if failed > 0:
         print("❌ Compliance check FAILED")

@@ -23,6 +23,11 @@ Do NOT change stage manually. Stage transitions are managed by SonataFlow via th
 
 Help the author write content. Answer questions about AsciiDoc, module structure, learning objectives, procedures. You are an assistant — do not advance stages or modify spec without explicit instruction.
 
+Run compliance check when asked:
+```bash
+python publishing-house/tools/ph-check.py
+```
+
 ## Zero-Touch Automation
 
 Zero-Touch (ZT) projects use [runtime-automation/](runtime-automation/) for runtime automation and
@@ -32,6 +37,12 @@ orchestrator for classic Showroom projects during intake.
 ## Stage: review or ready
 
 Show the author the current spec or compliance results and wait for instruction.
+
+## Tools
+
+All project tools live in `publishing-house/tools/`:
+- `ph-intake.py` — submit intake to Central API (called by orchestrator skill)
+- `ph-check.py` — run local compliance checks against spec and content
 
 ## File locations
 - Project spec: `publishing-house/spec.yaml`

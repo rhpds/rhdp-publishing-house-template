@@ -40,6 +40,7 @@ MENU_MAP = {"1": "agd-open", "2": "agd-guided", "3": "zt-guided"}
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the argument parser for the scaffold CLI."""
     parser = argparse.ArgumentParser(
         description="Set up this project for a specific lab pattern.",
     )
@@ -76,7 +77,7 @@ def update_manifest(path: Path, showroom_type: str, infrastructure: str) -> None
 
     Uses regex replacement to preserve comments and formatting.
     """
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     text = re.sub(
         r'^(\s*showroom_type:\s*)""',
         rf'\g<1>"{showroom_type}"',
@@ -91,7 +92,7 @@ def update_manifest(path: Path, showroom_type: str, infrastructure: str) -> None
         count=1,
         flags=re.MULTILINE,
     )
-    path.write_text(text)
+    path.write_text(text, encoding="utf-8")
 
 
 def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
@@ -189,6 +190,7 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Entry point.  Parse args, resolve pattern, and run scaffold."""
     args = build_parser().parse_args(argv)
 
     root = Path.cwd()

@@ -145,7 +145,7 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
     if dry_run:
         print(f"\n--- Dry run: pattern={pattern} ---")
         print(f"  Copy {pattern_src}/ → project root")
-        print(f"  Overwrite {ui_config} (type: {'showroom' if showroom_type == 'classic' else 'guided'})")
+        print(f"  Overwrite {ui_config}")
         print(f"  Update {manifest}: showroom_type={showroom_type!r}, infrastructure={infrastructure!r}")
         print(f"  Remove {scaffold_dir}/")
         print("No changes made.")

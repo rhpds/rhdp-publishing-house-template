@@ -6,6 +6,32 @@ Read `publishing-house/spec.yaml`. Check the workflow stage by running `/rhdp-pu
 
 Do NOT read manifest.yaml — it does not exist. All project data is in `publishing-house/spec.yaml`.
 
+## State
+Project state tracked in [publishing-house/spec.yaml](publishing-house/spec.yaml).
+Read it first every session.
+
+## Scaffolding
+Run `python scaffold.py` after cloning to select a lab pattern (AgD v2 Open,
+AgD v2 Guided, or ZT Guided). The script copies pattern-specific stubs into the
+project root, sets `showroom_type` and `infrastructure` in the spec, and
+removes `_scaffolds/`. The orchestrator calls `scaffold.py --pattern <name> --force`
+during intake.
+
+## Content
+Showroom AsciiDoc content lives in [content/](content/). The Antora component descriptor
+is at `content/antora.yml` and modules are in `content/modules/ROOT/pages/`.
+
+## Automation
+Pattern-specific automation directories are created by `scaffold.py`:
+
+- `runtime-automation/` — Per-module solve/validate playbooks (Guided patterns)
+- `setup-automation/` — Environment setup playbook (ZT Guided only)
+- `config/` — Project Zero instance/network/firewall definitions (ZT Guided only)
+
+Common to all patterns:
+
+- `qa-automation/` — Health check and e2e test playbooks
+
 ## Architecture
 
 - **project_id**: comes from `catalog-info.yaml` `metadata.name`
@@ -27,12 +53,6 @@ Run compliance check when asked:
 ```bash
 python publishing-house/tools/ph-check.py
 ```
-
-## Zero-Touch Automation
-
-Zero-Touch (ZT) projects use [runtime-automation/](runtime-automation/) for runtime automation and
-[setup-automation/](setup-automation/) for setup automation. These directories are removed by the
-orchestrator for classic Showroom projects during intake.
 
 ## Stage: review or ready
 

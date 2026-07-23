@@ -1,0 +1,88 @@
+# Publishing House — Project Spec
+# This file contains structured project data for programmatic validation.
+# The human-readable version is publishing-house/spec/design.md.
+# When created via RHDH, the project.* fields are pre-populated from the template form.
+
+project:
+  slug: ""                     # project identifier (e.g., ocp-virt-getting-started)
+  owner_email: ""              # author's email (e.g., jsmith@redhat.com)
+  content_type: ""             # lab | demo
+  deployment_mode: ""          # rhdp_published | self_published
+  initiative_key: ""           # rh1_2027 | summit_2027 | none
+  showroom_type: ""            # classic | zero_touch
+  description: ""              # short project description
+  content_reviewer_email: ""   # assigned by the team, not by the author
+  infra_reviewer_email: ""     # assigned by the team, not by the author
+  jira_ticket: ""              # populated by Central API after epic creation
+  workflow_id: ""              # populated by orchestrator from SonataFlow
+
+spec:
+  title: ""                    # derived from the project goal during intake
+  learning_objectives: []      # [{objective text}] — from design.md Learning Objectives
+  modules: []                  # [{title, duration_min}] — from design.md Module Map
+  environment:
+    ocp_version: ""            # e.g. 4.20 — minimum 4.20
+    topology: ""               # shared-cluster | per-student | cnv-pool
+    cloud_provider: cnv        # cnv | aws | azure — cnv is the default
+    cluster_type: ""           # sno | multinode
+    control_plane_instance_count: null  # 1 if sno, 3 if multinode
+    control_plane_cpu: null            # 32 if sno, 16 if multinode
+    control_plane_ram_gb: null         # 128 if sno, 64 if multinode
+    max_concurrent_users: null         # required if topology = per-student or cnv-pool
+    aap_version: ""                    # required if AAP in products
+    ai_requirement: ""                 # maas | gpu | none
+    ai_model_tier: ""                  # open-source | frontier (if ai_requirement = maas or gpu)
+    ai_model_name: ""                  # specific model e.g. granite-3.1-8b
+    ai_justification: ""               # required if ai_model_tier = frontier or ai_requirement = gpu
+    non_ga_products: []                # list of non-GA products/versions
+    non_ga_access_plan: ""             # how access is provided for non-GA products
+    external_services: []              # named external service dependencies e.g. [github.com]
+    worker_count: null                 # number of worker nodes
+    worker_cpu: null                   # vCPU per worker
+    worker_ram_gb: null                # RAM per worker in GB
+    worker_disk_gb: null               # disk per worker in GB
+    gpu_nodes: 0                       # number of GPU nodes (0 = none)
+    gpu_type: ""                       # e.g. NVIDIA A100 40GB (required if gpu_nodes > 0)
+  duration_hours: null
+  audience: ""                 # beginner | intermediate | advanced
+
+compliance:
+  last_hard_check: null
+  hard_result: null
+
+tracking:
+  paused: false
+  pause_reason: null
+
+# Approval checklist — filled collaboratively by author + system + reviewers
+# Authors fill: differentiation, assessment_strategy, prerequisites_verifiable
+# System auto-computes: rcars_overlap_pct, rcars_top_matches, peak_environments, cost_per_run_est
+# Reviewers fill: their decision + notes
+approval_checklist:
+
+  # Content Dev Manager — reads spec/design.md/module outlines directly
+  manager:
+    decision: null             # approved | denied | needs_info
+    decision_notes: ""
+
+  # Content review — authored fields + auto-computed RCARS overlap
+  content:
+    prerequisites_verifiable: null  # true | false — can lab validate prereqs automatically?
+    assessment_strategy: ""         # how success is measured per module
+    differentiation: ""             # how this differs from existing content
+    rcars_overlap_pct: null         # AUTO-COMPUTED by Central
+    rcars_top_matches: []           # AUTO-COMPUTED: [{ci_name, display_name, url}]
+    decision: null                  # approved | denied | needs_info
+    decision_notes: ""
+    rejections: []
+
+  # Infra review — auto-computed fields + infra team fills base CI
+  infra:
+    peak_environments: null         # AUTO-COMPUTED: max_concurrent_users x topology factor
+    cost_per_run_est: ""            # AUTO-COMPUTED: indicative cost from sizing
+    provisioning_time_est: ""       # AUTO-COMPUTED for standard CNV
+    agnosticv_base_ci: ""           # INFRA fills: which base CI supports this
+    decision: null                  # approved | denied | needs_info
+    decision_notes: ""
+    approved_by: ""
+    rejections: []

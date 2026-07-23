@@ -29,7 +29,7 @@
 2. [Action verb] [specific, measurable outcome]
 3. [Action verb] [specific, measurable outcome]
 
-<!-- 3-7 objectives. Start with action verbs: Configure, Deploy, Create, Implement, Troubleshoot, Monitor, Scale. Each should be testable. NOT: Understand, Learn, Know. -->
+<!-- Scale to duration: up to 3 objectives per 45 min of content. Start with action verbs: Configure, Deploy, Create, Implement, Troubleshoot, Monitor, Scale. Each should be testable. NOT: Understand, Learn, Know. -->
 
 ## Content Type
 
@@ -81,8 +81,9 @@
 
 <!-- Not all fields must be known at intake. "TBD, estimating ~X" is fine. -->
 
-## Assessment Strategy
+## Assessment Strategy (Optional)
 
-[How will we know the learner successfully completed each module? Per module: verification script, visible result in the UI, quiz question, or trust-based. Be specific.]
+<!-- Optional — skip this section for demos or classic labs without verification. -->
+<!-- Relevant for Zero-Touch labs with solve/validate buttons or labs with automated checks. -->
 
-<!-- "Trust-based" is acceptable but must be stated explicitly. Prefer verification scripts or visible UI results where possible. -->
+[If applicable: how will we know the learner successfully completed each module? Per module: verification script, solve/validate button, visible result in the UI, or automated check.]

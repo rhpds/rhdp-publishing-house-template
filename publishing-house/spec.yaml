@@ -28,7 +28,7 @@ spec:
     control_plane_instance_count: null  # 1 if sno, 3 if multinode
     control_plane_cpu: null            # 32 if sno, 16 if multinode
     control_plane_ram_gb: null         # 128 if sno, 64 if multinode
-    max_concurrent_users: null         # required if topology = per-student or cnv-pool
+    max_concurrent_users: null         # required if topology = shared-cluster (sizing for simultaneous users)
     aap_version: ""                    # required if AAP in products
     ai_requirement: ""                 # maas | gpu | none
     ai_model_tier: ""                  # open-source | frontier (if ai_requirement = maas or gpu)

@@ -1,6 +1,3 @@
 # Antora build output
 www/
 .cache/
-
-# Publishing House local stage cache
-.ph-stage

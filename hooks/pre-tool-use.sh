@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 # PreToolUse hook — enforces stage-based tool allow-list.
-# Reads stage.current from publishing-house/manifest.yaml.
-# Blocks any tool not in the approved set for the current stage.
+# Reads stage from .ph-stage (written by the /rhdp-publishing-house skill).
+# If no stage file exists, all tools are allowed.
 
-MANIFEST="publishing-house/manifest.yaml"
+STAGE_FILE=".ph-stage"
 TOOL="${CLAUDE_TOOL_NAME:-${TOOL_NAME:-}}"
 
-# If no tool name provided or no manifest, pass through
 [[ -z "$TOOL" ]] && exit 0
-[[ ! -f "$MANIFEST" ]] && exit 0
+[[ ! -f "$STAGE_FILE" ]] && exit 0
 
-# Read current stage
-STAGE=$(grep -E "^\s+current:" "$MANIFEST" | head -1 | sed 's/.*current:\s*//' | tr -d '"' | tr -d "'" | tr -d ' ')
+STAGE=$(tr -d '[:space:]' < "$STAGE_FILE")
 
 case "$STAGE" in
   intake)
@@ -28,7 +26,6 @@ case "$STAGE" in
     ;;
 esac
 
-# Block reporting-db-prod and other non-PH tools during intake
 BLOCKED="reporting.db.prod|mcp__reporting|ph_rcars_query"
 if echo "$TOOL" | grep -qiE "$BLOCKED"; then
   echo "[PH Hook] BLOCKED: '$TOOL' is not permitted in stage='$STAGE'. Use only PH-approved tools." >&2

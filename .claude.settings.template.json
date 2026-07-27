@@ -2,6 +2,17 @@
   "description": "Copy this to .claude/settings.json and customize for your project",
   "notes": "This file cannot be committed due to Claude Code security restrictions on .claude/",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'STAGE=$(cat .ph-stage 2>/dev/null | tr -d \" \"); [ -n \"$STAGE\" ] && echo \"PH PROJECT CONTEXT: This is a Publishing House project in stage=[$STAGE]. Follow the Stage instructions in CLAUDE.md immediately.\" || true'"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": ".*",

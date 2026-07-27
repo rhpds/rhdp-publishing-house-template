@@ -1,7 +1,9 @@
 # [Project Title]
 
-<!-- This file is populated by the intake agent during the intake phase. -->
-<!-- Run /rhdp-publishing-house to get started, or fill in the sections below manually. -->
+<!-- This file is the design document for your lab or demo. -->
+<!-- Fill in each section below, or run /rhdp-publishing-house to have the intake skill help. -->
+<!-- Sections marked with [brackets] are placeholders — replace with real content. -->
+<!-- The validation gate checks for all required sections before submission. -->
 
 ## Problem Statement
 
@@ -12,8 +14,14 @@
 - **Role:** [Data scientists, platform engineers, developers, etc.]
 - **Experience level:** [Beginner, intermediate, or advanced]
 - **What they already know:** [Existing skills and knowledge]
-- **What they don't know:** [Skills this workshop teaches]
-- **Prerequisites:** [What they need before starting]
+- **What they don't know:** [Skills this lab teaches]
+
+## Prerequisites
+
+- [What the learner must know or have completed before starting]
+- [Can the lab validate these automatically? Yes/No — brief explanation]
+
+<!-- If no prerequisites, write "None" -->
 
 ## Learning Objectives
 
@@ -21,11 +29,11 @@
 2. [Action verb] [specific, measurable outcome]
 3. [Action verb] [specific, measurable outcome]
 
-<!-- 3-7 objectives. Start with action verbs: Configure, Deploy, Create, Implement, Troubleshoot, Monitor, Scale. Each should be testable. NOT: Understand, Learn, Know. -->
+<!-- Scale to duration: up to 3 objectives per 45 min of content. Start with action verbs: Configure, Deploy, Create, Implement, Troubleshoot, Monitor, Scale. Each should be testable. NOT: Understand, Learn, Know. -->
 
 ## Content Type
 
-[Workshop (hands-on) or Demo (presenter-led)]
+[Lab (hands-on) or Demo (presenter-led)]
 
 ## Products & Technologies
 
@@ -42,9 +50,9 @@
 | 2 | [Module title] | [XX min] |
 | — | **Total hands-on** | **[X hours]** |
 | — | Intro / presentation | [~XX min] |
-| — | **Total workshop** | **[~X hours]** |
+| — | **Total lab** | **[~X hours]** |
 
-<!-- Each module 10-30 min. Total: workshop 1-4 hours, demo 15-45 min. Modules should build on each other. -->
+<!-- Each module 10-30 min. Total: lab 1-4 hours, demo 15-45 min. Modules should build on each other. -->
 
 ## Difficulty Level
 
@@ -60,11 +68,22 @@
 
 ## Infrastructure Requirements
 
-- **Base infrastructure:** [Base CI type: ocp4-cluster, ocp-workloads, cloud-vms-base, or existing CI name]
-- **Sizing:** [Node types and counts with resources — e.g., "3 masters (4 CPU, 16GB RAM), 6 workers (8 CPU, 32GB RAM, 100GB disk)"]
-- **Cloud provider:** [CNV (default), AWS, GCP, Azure]
+- **Cloud provider:** [CNV (default), AWS, or Azure]
+- **Cluster type:** [Multinode or SNO (Single Node OpenShift)]
+- **OCP version:** [e.g. 4.20 — minimum 4.20]
+- **Topology:** [Shared cluster, per-student, or CNV pool]
+- **Sizing:** [Node types and counts with resources — e.g., "3 control plane (16 CPU, 64GB RAM), 6 workers (8 CPU, 32GB RAM, 100GB disk)"]
 - **Automation approach:** [Ansible, GitOps (Helm + ArgoCD), or combo]
-- **Existing workloads to reuse:** [AgnosticD workloads, GitOps repos, Ansible collections — or "None"]
-- **New workloads needed:** [What needs to be developed — or "None"]
+- **AI/MaaS:** [None, MaaS (open-source model), MaaS (frontier model), or dedicated GPU — include justification if not "none"]
+- **External services:** [Named services — e.g., github.com, registry.access.redhat.com — or "None"]
+- **AAP version:** [e.g. 2.5 — only if AAP is in products; omit otherwise]
+- **Non-GA products:** [Product name + version, with access plan — or "None (all products are GA)"]
 
-<!-- Not all fields must be known at intake. "TBD, estimating ~X" is fine. Spec refinement fills gaps. -->
+<!-- Not all fields must be known at intake. "TBD, estimating ~X" is fine. -->
+
+## Assessment Strategy (Optional)
+
+<!-- Optional — skip this section for demos or classic labs without verification. -->
+<!-- Relevant for Zero-Touch labs with solve/validate buttons or labs with automated checks. -->
+
+[If applicable: how will we know the learner successfully completed each module? Per module: verification script, solve/validate button, visible result in the UI, or automated check.]

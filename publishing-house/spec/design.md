@@ -5,9 +5,9 @@
 <!-- Sections marked with [brackets] are placeholders — replace with real content. -->
 <!-- The validation gate checks for all required sections before submission. -->
 
-## Problem Statement
+## Overview
 
-[What gap does this fill? Who has this problem and why can't they solve it today? 2-3 sentences, specific — reference a real persona with a real need.]
+[2-3 sentences on what this lab or demo is and why it exists. Then a direct description of what participants will do — specific enough that someone reading this section immediately understands the content without interpretation. No flowery language. Example: "Participants will deploy a 3-tier application on OpenShift, configure autoscaling, and troubleshoot a simulated pod failure."]
 
 ## Target Audience
 

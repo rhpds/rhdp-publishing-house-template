@@ -108,7 +108,6 @@ def sync_rejection(spec_path, rejection):
                 "text": reason.get("text", ""),
                 "resolved": reason.get("resolved", False),
                 "reviewer": rejection.get("reviewerName", ""),
-                "stage": target_section,
                 "timestamp": rejection.get("timestamp", ""),
             })
             changed = True

@@ -3,7 +3,7 @@
 
 Always calls /workflow-data and /workflow-state. Only writes fields to
 spec.yaml and catalog-info.yaml if they are not already set locally.
-Rejections are always synced, matched by rejection_id and reason index.
+Rejections are synced per-reason by UUID, routed to content/infra sections.
 
 Output: key:value pairs, one per line
   stage:intake
@@ -65,39 +65,57 @@ def set_yaml_value(filepath, dotted_key, value):
 
 
 def sync_rejection(spec_path, rejection):
-    """Append rejection to spec.yaml if its rejection_id is new. Never overwrites existing entries."""
+    """Sync rejection reasons to spec.yaml by per-reason UUID.
+
+    New reasons are routed to content or infra based on reviewerStage.
+    Already-known reasons (by id) stay in their original section and get
+    their resolved flag updated.
+    """
     if not rejection:
         return
 
-    rejection_id = rejection.get("rejectionId", "")
-    if not rejection_id:
+    reasons = rejection.get("reasons", [])
+    if not reasons:
         return
 
     reviewer_stage = rejection.get("reviewerStage", "")
-    section = "content" if reviewer_stage == "content_review" else "infra"
+    target_section = "content" if reviewer_stage == "content_review" else "infra"
 
     spec_data = yaml.safe_load(spec_path.read_text()) or {}
     checklist = spec_data.setdefault("approval_checklist", {})
-    section_data = checklist.setdefault(section, {})
-    rejections = section_data.setdefault("rejections", [])
 
-    known_ids = {r.get("rejection_id") for r in rejections}
-    if rejection_id in known_ids:
-        return
+    known_ids = {}
+    for section in ("content", "infra"):
+        section_data = checklist.setdefault(section, {})
+        for r in section_data.get("rejections", []):
+            known_ids[r.get("id")] = (section, r)
 
-    reasons = []
-    for r in rejection.get("reasons", []):
-        reasons.append({"id": r.get("id"), "text": r.get("text"), "resolved": False})
+    changed = False
+    for reason in reasons:
+        rid = reason.get("id")
+        if not rid:
+            continue
+        if rid in known_ids:
+            _, existing = known_ids[rid]
+            if existing.get("resolved") != reason.get("resolved", False):
+                existing["resolved"] = reason.get("resolved", False)
+                changed = True
+        else:
+            section_data = checklist.setdefault(target_section, {})
+            rej_list = section_data.setdefault("rejections", [])
+            rej_list.append({
+                "id": rid,
+                "text": reason.get("text", ""),
+                "resolved": reason.get("resolved", False),
+                "reviewer": rejection.get("reviewerName", ""),
+                "stage": target_section,
+                "timestamp": rejection.get("timestamp", ""),
+            })
+            changed = True
 
-    rejections.append({
-        "rejection_id": rejection_id,
-        "reviewer": rejection.get("reviewerName", ""),
-        "timestamp": rejection.get("timestamp", ""),
-        "reasons": reasons,
-    })
-
-    with open(spec_path, "w") as f:
-        yaml.dump(spec_data, f, default_flow_style=False, sort_keys=False)
+    if changed:
+        with open(spec_path, "w") as f:
+            yaml.dump(spec_data, f, default_flow_style=False, sort_keys=False)
 
 
 def main():
@@ -191,10 +209,9 @@ def main():
     unresolved = 0
     refreshed_spec = yaml.safe_load(spec_path.read_text()) or {}
     for section in ("content", "infra"):
-        for rej in refreshed_spec.get("approval_checklist", {}).get(section, {}).get("rejections", []):
-            for reason in rej.get("reasons", []):
-                if not reason.get("resolved", False):
-                    unresolved += 1
+        for reason in refreshed_spec.get("approval_checklist", {}).get(section, {}).get("rejections", []):
+            if not reason.get("resolved", False):
+                unresolved += 1
 
     print(f"stage:{stage}")
     print(f"workflow_id:{wfid}")

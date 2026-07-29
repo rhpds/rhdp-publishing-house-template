@@ -68,7 +68,7 @@
 
 ## Infrastructure Requirements
 
-- **Cloud provider:** [CNV (default), AWS, or Azure]
+- **Cloud provider:** [CNV (default), AWS, or Troshka (bare-metal/nested virt)]
 - **Cluster type:** [Multinode or SNO (Single Node OpenShift)]
 - **OCP version:** [e.g. 4.20 — minimum 4.20]
 - **Topology:** [Shared cluster, per-student, or CNV pool]

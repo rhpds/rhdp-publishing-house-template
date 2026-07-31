@@ -14,6 +14,7 @@ import ssl
 import subprocess
 import sys
 import time
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -98,7 +99,7 @@ def _resolve_github_user_device_flow():
     try:
         req = urllib.request.Request(
             "https://github.com/login/device/code",
-            data=urllib.request.urlencode({
+            data=urllib.parse.urlencode({
                 "client_id": GITHUB_OAUTH_CLIENT_ID,
                 "scope": "read:user",
             }).encode(),
@@ -121,7 +122,7 @@ def _resolve_github_user_device_flow():
             time.sleep(interval)
             req = urllib.request.Request(
                 "https://github.com/login/oauth/access_token",
-                data=urllib.request.urlencode({
+                data=urllib.parse.urlencode({
                     "client_id": GITHUB_OAUTH_CLIENT_ID,
                     "device_code": device_code,
                     "grant_type": "urn:ietf:params:oauth:grant-type:device_code",

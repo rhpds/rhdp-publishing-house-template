@@ -114,8 +114,16 @@ def _resolve_github_user_device_flow():
         interval = data.get("interval", 5)
         expires_in = data.get("expires_in", 900)
 
-        print(f"\n  To authenticate with GitHub, open: {verification_uri}", file=sys.stderr)
-        print(f"  Enter code: {user_code}\n", file=sys.stderr)
+        print()
+        print("╔" + "═" * 54 + "╗")
+        print("║  \033[1mGitHub Authentication Required\033[0m" + " " * 22 + "║")
+        print("║" + " " * 54 + "║")
+        print(f"║  1. Open:  {verification_uri:<42}║")
+        print(f"║  2. Enter: \033[1m{user_code}\033[0m" + " " * (42 - len(user_code)) + "║")
+        print("║" + " " * 54 + "║")
+        print("║  Waiting for authorization..." + " " * 24 + "║")
+        print("╚" + "═" * 54 + "╝")
+        print()
 
         deadline = time.time() + expires_in
         while time.time() < deadline:
@@ -139,17 +147,17 @@ def _resolve_github_user_device_flow():
                 interval = token_data.get("interval", interval + 5)
                 continue
             if error:
-                print(f"  Device flow error: {error}", file=sys.stderr)
+                print(f"  Device flow error: {error}")
                 return ""
 
             access_token = token_data.get("access_token", "")
             if access_token:
                 return _github_user_from_token(access_token)
 
-        print("  Device flow timed out.", file=sys.stderr)
+        print("  Device flow timed out.")
         return ""
     except Exception as e:
-        print(f"  Device flow failed: {e}", file=sys.stderr)
+        print(f"  Device flow failed: {e}")
         return ""
 
 

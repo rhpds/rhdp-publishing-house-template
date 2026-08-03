@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 SCAFFOLD_DIR = Path("_scaffolds")
-MANIFEST = Path("publishing-house/manifest.yaml")
+MANIFEST = Path("publishing-house/spec.yaml")
 UI_CONFIG = Path("ui-config.yml")
 
 PATTERN_DIRS = [
@@ -111,7 +111,7 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         )
         return 1
 
-    if not (root / "content").is_dir() or not manifest.is_file():
+    if not (root / "content").is_dir():
         print(
             "Error: scaffold.py must be run from the template root — "
             f"expected to find `{SCAFFOLD_DIR}/` and `content/` in the current directory.",
@@ -152,7 +152,10 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         print(f"  Copy from {pattern_src}/:")
         for f in files:
             print(f"    → {f}")
-        print(f"  Update {manifest}: showroom_type={showroom_type!r}, infrastructure={infrastructure!r}")
+        if manifest.is_file():
+            print(f"  Update {manifest}: showroom_type={showroom_type!r}, infrastructure={infrastructure!r}")
+        else:
+            print(f"  Skip {manifest} update (file not present yet)")
         print(f"  Remove {scaffold_dir}/")
         print("No changes made.")
         return 0
@@ -168,8 +171,10 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         # 2. Copy pattern files into project root
         shutil.copytree(pattern_src, root, dirs_exist_ok=True)
 
-        # 3. Update manifest
-        update_manifest(manifest, showroom_type, infrastructure)
+        # 3. Update manifest (spec.yaml is populated by skeleton substitution;
+        #    skip if it doesn't exist yet — fields will be set at instantiation)
+        if manifest.is_file():
+            update_manifest(manifest, showroom_type, infrastructure)
 
         # 4. Remove _scaffolds/
         shutil.rmtree(scaffold_dir)

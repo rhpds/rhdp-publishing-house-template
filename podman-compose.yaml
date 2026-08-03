@@ -6,7 +6,6 @@ services:
       - WAIT_FOR_GIT_CLONER=false
       - ANTORA_ENABLE_DEV_MODE=true
       - ANTORA_WATCH=true
-      - ANTORA_UI_BUNDLE_URL=https://github.com/rhpds/rhdp_showroom_theme/releases/download/showroom-template/ui-bundle.zip
     volumes:
       - ./:/files:z
       - www:/output:z

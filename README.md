@@ -20,11 +20,14 @@ python scaffold.py
 
 The scaffold script (`scaffold.py`) configures this template for one of three lab patterns:
 
-| Pattern | Infrastructure | Showroom | Created Directories |
-|---------|---------------|----------|---------------------|
-| **AgD v2 Open** | AgnosticD v2 | Classic (no solve/validate) | `content/` only |
-| **AgD v2 Guided** | AgnosticD v2 | Guided (solve/validate buttons) | `runtime-automation/`, `content/` |
-| **ZT Guided** | Project Zero | Guided (solve/validate buttons) | `config/`, `setup-automation/`, `runtime-automation/`, `content/` |
+| Pattern | Infrastructure | Showroom | Created Directories | site.yml |
+|---------|---------------|----------|---------------------|----------|
+| **AgD v2 Open** | AgnosticD v2 | Classic (no solve/validate) | `content/` only | `rhdp_showroom_theme` (default) |
+| **AgD v2 Guided** | AgnosticD v2 | Guided (solve/validate buttons) | `runtime-automation/`, `content/` | `nookbag-bundle` (overwritten) |
+| **ZT Guided** | Project Zero | Guided (solve/validate buttons) | `config/`, `setup-automation/`, `runtime-automation/`, `content/` | `nookbag-bundle` (overwritten) |
+
+After scaffolding, edit `ui-config.yml` to configure tabs for your infrastructure target (terminals, OCP console, external URLs).
+See the [showroom-template](https://github.com/rhpds/showroom-template) branches for example tab configurations.
 
 Run `python scaffold.py --help` for non-interactive usage.
 
@@ -36,8 +39,8 @@ Run `python scaffold.py --help` for non-interactive usage.
 - `qa-automation/` — Health check and e2e test playbooks
 - `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080)
 - `publishing-house/` — Project state (manifest), specs, reviews, decisions
-- `site.yml` — Antora playbook (Showroom build config)
-- `ui-config.yml` — Showroom UI layout config (set by scaffold)
+- `site.yml` — Antora playbook (open patterns use `rhdp_showroom_theme`; guided patterns use `nookbag-bundle`)
+- `ui-config.yml` — Showroom UI layout config (set by scaffold, customize tabs afterward)
 
 ### After Scaffolding (pattern-specific)
 

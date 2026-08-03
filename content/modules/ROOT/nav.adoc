@@ -1,1 +1,3 @@
-* xref:index.adoc[Course Overview]
+* xref:index.adoc[Getting Started]
+* xref:module-01.adoc[Module 1: Your First Lab Page]
+* xref:module-02.adoc[Module 2: Another Module]

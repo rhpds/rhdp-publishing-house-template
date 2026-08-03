@@ -144,8 +144,14 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
     # --- Dry-run summary ---
     if dry_run:
         print(f"\n--- Dry run: pattern={pattern} ---")
-        print(f"  Copy {pattern_src}/ → project root")
-        print(f"  Overwrite {ui_config}")
+        files = sorted(
+            p.relative_to(pattern_src)
+            for p in pattern_src.rglob("*")
+            if p.is_file()
+        )
+        print(f"  Copy from {pattern_src}/:")
+        for f in files:
+            print(f"    → {f}")
         print(f"  Update {manifest}: showroom_type={showroom_type!r}, infrastructure={infrastructure!r}")
         print(f"  Remove {scaffold_dir}/")
         print("No changes made.")

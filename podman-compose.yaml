@@ -2,13 +2,17 @@ version: "3.0"
 services:
   antora:
     image: quay.io/rhpds/antora:v1.3.0
+    # Antora's entrypoint always rewrites site.yml at startup (to add or
+    # remove the dev-mode extension per ANTORA_ENABLE_DEV_MODE below), which
+    # needs write access to this bind-mounted file. Running as root avoids a
+    # `podman unshare chown` step on rootless Podman, since root inside the
+    # container maps back to the host user that owns these files.
+    user: "0:0"
     environment:
       - WAIT_FOR_GIT_CLONER=false
       # Dev mode lists sidebar pages automatically, even before they're added
-      # to nav.adoc, and adds an Attributes Page. Disabled by default so this
-      # stack works with no extra host permission setup. To enable, uncomment
-      # the line below and see "Enabling Dev Mode" in README.md /
-      # content/modules/ROOT/pages/index.adoc.
+      # to nav.adoc, and adds an Attributes Page for inspecting
+      # content/antora.yml values. Disabled by default -- uncomment to enable.
       # - ANTORA_ENABLE_DEV_MODE=true
       - ANTORA_WATCH=true
     volumes:

@@ -41,19 +41,9 @@ Open http://localhost:8080. Changes to `content/` rebuild automatically -- no re
 
 ### Enabling Dev Mode
 
-Dev mode lists pages in the sidebar automatically, even before you add them to `nav.adoc`, and adds an Attributes Page for inspecting the current `content/antora.yml` attribute values -- handy while drafting new modules. It's disabled by default so `podman-compose up` works out of the box with no extra setup.
+Dev mode lists pages in the sidebar automatically, even before you add them to `nav.adoc`, and adds an Attributes Page for inspecting the current `content/antora.yml` attribute values -- handy while drafting new modules. It's disabled by default.
 
-To enable it:
-
-1. Uncomment `ANTORA_ENABLE_DEV_MODE=true` in `podman-compose.yaml`.
-2. Grant the container (which runs as UID 1001) write access to `site.yml`, which it needs to inject the dev-mode extension at startup. Rootless Podman maps your host files to UID 0 inside the container, so it can't write to them without this fix first:
-
-   ```bash
-   podman unshare chown -R 1001:0 site.yml
-   ```
-3. Run `podman-compose up` again.
-
-After stopping the container, reclaim ownership so you can edit `site.yml` again (`podman unshare chown -R 0:0 site.yml`, or `git checkout -- site.yml` to restore both content and ownership).
+To enable it, uncomment `ANTORA_ENABLE_DEV_MODE=true` in `podman-compose.yaml` and run `podman-compose up` again.
 
 ## Structure
 

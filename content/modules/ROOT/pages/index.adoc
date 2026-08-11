@@ -1,7 +1,7 @@
 = Getting Started
 :navtitle: Getting Started
 
-You've cloned the https://github.com/rhpds/showroom_template_nookbag[Showroom content template] -- a minimal starting point for authoring lab instructions on the https://demo.redhat.com[Red Hat Demo Platform].
+You've cloned the https://github.com/rhpds/rhdp-publishing-house-template[Publishing House template] -- a minimal starting point for authoring lab instructions on the https://demo.redhat.com[Red Hat Demo Platform].
 This template gives you a working Antora site with the Red Hat Demo Platform UI theme, ready for you to replace with your own content.
 
 == Setup Checklist

@@ -31,6 +31,20 @@ See the [showroom-template](https://github.com/rhpds/showroom-template) branches
 
 Run `python scaffold.py --help` for non-interactive usage.
 
+## Local Preview
+
+```bash
+podman-compose up
+```
+
+Open http://localhost:8080. Changes to `content/` rebuild automatically -- no restart needed.
+
+### Enabling Dev Mode
+
+Dev mode lists pages in the sidebar automatically, even before you add them to `nav.adoc`, and adds an Attributes Page for inspecting the current `content/antora.yml` attribute values -- handy while drafting new modules. It's disabled by default.
+
+To enable it, uncomment `ANTORA_ENABLE_DEV_MODE=true` in `podman-compose.yaml` and run `podman-compose up` again.
+
 ## Structure
 
 - `scaffold.py` — Lab pattern scaffolding script (run once after cloning)

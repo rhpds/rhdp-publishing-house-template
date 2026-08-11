@@ -30,25 +30,6 @@ Follow these steps to make the template yours:
 
 == Local Preview
 
-The Antora container runs as UID 1001 and needs to modify `site.yml` at startup (to inject dev-mode extensions).
-With rootless Podman, your host files map to UID 0 inside the container, so the container cannot write to them without a permissions fix first.
-
-Before your first run, grant the container write access:
-
-[source,bash]
-----
-podman unshare chown -R 1001:0 site.yml
-----
-
-After stopping the container, reclaim ownership so you can edit the file again:
-
-[source,bash]
-----
-podman unshare chown -R 0:0 site.yml
-----
-
-TIP: `git checkout -- site.yml` also restores both content and ownership.
-
 [source,bash]
 ----
 podman-compose up
@@ -56,6 +37,12 @@ podman-compose up
 
 Open http://localhost:8080 in your browser.
 The site rebuilds automatically whenever you save a content file -- no restart needed.
+
+=== Enabling Dev Mode
+
+Dev mode lists pages in the sidebar automatically, even before you add them to `nav.adoc`, and adds an Attributes Page for inspecting the current `content/antora.yml` attribute values -- handy while drafting new modules. It's disabled by default.
+
+To enable it, uncomment `ANTORA_ENABLE_DEV_MODE=true` in `podman-compose.yaml` and run `podman-compose up` again.
 
 == Directory Layout
 

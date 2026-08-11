@@ -53,8 +53,12 @@ Place images in `content/modules/ROOT/images/` and reference them:
 
 [source,asciidoc]
 ----
-image::my-screenshot.png[Alt text,width=600]
+image::showroom-preview.png[Alt text,width=600]
 ----
+
+Here's that example rendered (a placeholder image -- swap it for your own screenshots):
+
+image::showroom-preview.png[Showroom local preview placeholder,width=600]
 
 To make an image expandable (click to zoom), add the `.expand` role.
 Use `.fullscreen` instead to open the image in true browser fullscreen:
@@ -62,10 +66,10 @@ Use `.fullscreen` instead to open the image in true browser fullscreen:
 [source,asciidoc]
 ----
 [.expand]
-image::my-screenshot.png[Alt text,width=600]
+image::showroom-preview.png[Alt text,width=600]
 
 [.fullscreen]
-image::my-screenshot.png[Alt text,width=600]
+image::showroom-preview.png[Alt text,width=600]
 ----
 
 == Execute in Terminal

@@ -57,6 +57,11 @@ podman-compose up
 Open http://localhost:8080 in your browser.
 The site rebuilds automatically whenever you save a content file -- no restart needed.
 
+You should see your lab content on the left and, for lab types that include one, a terminal panel on the right:
+
+.Placeholder -- replace with a real screenshot of your running lab
+image::showroom-preview.png[Showroom local preview with lab content on the left and a terminal panel on the right,width=800]
+
 == Directory Layout
 
 [source,text]

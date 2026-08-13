@@ -15,7 +15,7 @@ Run `python scaffold.py` after cloning to select a lab pattern (AgD v2 Open,
 AgD v2 Guided, or ZT Guided). The script copies pattern-specific stubs into the
 project root (including `ui-config.yml` and, for guided patterns, `site.yml` with
 the nookbag UI bundle), sets `showroom_type` and `infrastructure` in the spec,
-and removes `_scaffolds/`. The orchestrator calls `scaffold.py --pattern <name> --force`
+and removes `.scaffolds/`. The orchestrator calls `scaffold.py --pattern <name> --force`
 during intake.
 
 ## Content

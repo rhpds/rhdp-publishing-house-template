@@ -44,13 +44,13 @@ Before scaffolding, the repo only has:
 
 Common to every pattern:
 
-- `content/` — Showroom AsciiDoc content (Antora modules)
+- `content/` — Showroom AsciiDoc content (Antora modules), pre-populated with a minimal `antora.yml`, `nav.adoc`, and `index.adoc`
 - `qa-automation/` — Health check and e2e test playbooks
 - `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080)
+- `site.yml` — Antora playbook. Defaults to the `rhdp_showroom_theme` bundle; guided patterns overwrite it with a `nookbag-bundle` version
 
 Pattern-specific:
 
-- `site.yml` — Antora playbook (open patterns use `rhdp_showroom_theme`; guided patterns use `nookbag-bundle`)
 - `ui-config.yml` — Showroom UI layout config (set by scaffold, customize tabs afterward)
 - `runtime-automation/` — Per-module solve/validate playbooks (Guided patterns)
 - `setup-automation/` — Environment setup playbook (ZT Guided only)

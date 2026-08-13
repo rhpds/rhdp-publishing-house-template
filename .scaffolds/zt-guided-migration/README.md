@@ -7,7 +7,7 @@ Showroom/nookbag content repo into this Publishing House template.
 
 ## Why this isn't a normal scaffold pattern
 
-The `zt-guided` pattern (see `_scaffolds/zt-guided/`) generates a fresh
+The `zt-guided` pattern (see `.scaffolds/zt-guided/`) generates a fresh
 project with placeholder Ansible playbooks for `runtime-automation/`,
 `setup-automation/`, and `config/`. A repo being migrated already has all of
 that — including working `runtime-automation/<module>/{solve,validation}-<host>.sh`

@@ -46,12 +46,12 @@ Common to every pattern:
 
 - `content/` — Showroom AsciiDoc content (Antora modules), pre-populated with a minimal `antora.yml`, `nav.adoc`, and `index.adoc`
 - `qa-automation/` — Health check and e2e test playbooks
-- `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080)
 - `site.yml` — Antora playbook. Defaults to the `rhdp_showroom_theme` bundle; guided patterns overwrite it with a `nookbag-bundle` version
 
 Pattern-specific:
 
 - `ui-config.yml` — Showroom UI layout config (set by scaffold, customize tabs afterward)
+- `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080). AgD v2 Open only — guided patterns rely on Nookbag to drive navigation and aren't previewable via plain Antora + httpd
 - `runtime-automation/` — Per-module solve/validate playbooks (Guided patterns)
 - `setup-automation/` — Environment setup playbook (ZT Guided only)
 - `config/` — Project Zero instance, network, and firewall definitions (ZT Guided only)

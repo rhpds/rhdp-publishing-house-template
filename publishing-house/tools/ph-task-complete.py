@@ -7,7 +7,7 @@ Usage: python ph-task-complete.py <task_id>
        python ph-task-complete.py write-e2e-tests
        python ph-task-complete.py write-health-check
 
-Calls POST /jira/{epic_key}/module/{task_id}/complete
+Calls POST /jira/{epic_key}/task/{task_id}/complete
 
 Output: JSON with {closed, ticket_key}
 """
@@ -82,7 +82,7 @@ def main():
         print(json.dumps({"closed": False, "ticket_key": "", "detail": "No epic key — self-published mode"}))
         sys.exit(0)
 
-    url = f"{central}/api/v1/jira/{epic_key}/module/{task_id}/complete"
+    url = f"{central}/api/v1/jira/{epic_key}/task/{task_id}/complete"
     req = urllib.request.Request(
         url,
         headers={

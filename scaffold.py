@@ -11,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-SCAFFOLD_DIR = Path("_scaffolds")
+SCAFFOLD_DIR = Path(".scaffolds")
 MANIFEST = Path("publishing-house/spec.yaml")
 UI_CONFIG = Path("ui-config.yml")
 
@@ -176,7 +176,7 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         if manifest.is_file():
             update_manifest(manifest, showroom_type, infrastructure)
 
-        # 4. Remove _scaffolds/
+        # 4. Remove .scaffolds/
         shutil.rmtree(scaffold_dir)
 
     except OSError as exc:

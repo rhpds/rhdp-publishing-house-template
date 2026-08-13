@@ -34,7 +34,7 @@ Run `python scaffold.py --help` for non-interactive usage.
 ## Structure
 
 - `scaffold.py` — Lab pattern scaffolding script (run once after cloning)
-- `_scaffolds/` — Pattern-specific files (removed after scaffolding)
+- `.scaffolds/` — Pattern-specific files (removed after scaffolding)
 - `content/` — Showroom AsciiDoc content (Antora modules)
 - `qa-automation/` — Health check and e2e test playbooks
 - `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080)

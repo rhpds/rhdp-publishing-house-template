@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 SCAFFOLD_DIR = Path(".scaffolds")
+COMMON_DIR = SCAFFOLD_DIR / "common"
 MANIFEST = Path("publishing-house/spec.yaml")
 UI_CONFIG = Path("ui-config.yml")
 
@@ -98,6 +99,7 @@ def update_manifest(path: Path, showroom_type: str, infrastructure: str) -> None
 def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
     """Run the scaffolding process.  Returns 0 on success, 1 on error."""
     scaffold_dir = root / SCAFFOLD_DIR
+    common_src = root / COMMON_DIR
     pattern_src = scaffold_dir / pattern
     manifest = root / MANIFEST
     ui_config = root / UI_CONFIG
@@ -111,10 +113,10 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         )
         return 1
 
-    if not (root / "content").is_dir():
+    if not (root / "publishing-house").is_dir():
         print(
             "Error: scaffold.py must be run from the template root — "
-            f"expected to find `{SCAFFOLD_DIR}/` and `content/` in the current directory.",
+            f"expected to find `{SCAFFOLD_DIR}/` and `publishing-house/` in the current directory.",
             file=sys.stderr,
         )
         return 1
@@ -144,6 +146,15 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
     # --- Dry-run summary ---
     if dry_run:
         print(f"\n--- Dry run: pattern={pattern} ---")
+        if common_src.is_dir():
+            common_files = sorted(
+                p.relative_to(common_src)
+                for p in common_src.rglob("*")
+                if p.is_file()
+            )
+            print(f"  Copy from {common_src}/:")
+            for f in common_files:
+                print(f"    → {f}")
         files = sorted(
             p.relative_to(pattern_src)
             for p in pattern_src.rglob("*")
@@ -168,15 +179,19 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
             if target.is_dir():
                 shutil.rmtree(target)
 
-        # 2. Copy pattern files into project root
+        # 2. Copy common files (shared by every pattern) into project root
+        if common_src.is_dir():
+            shutil.copytree(common_src, root, dirs_exist_ok=True)
+
+        # 3. Copy pattern-specific files into project root
         shutil.copytree(pattern_src, root, dirs_exist_ok=True)
 
-        # 3. Update manifest (spec.yaml is populated by skeleton substitution;
+        # 4. Update manifest (spec.yaml is populated by skeleton substitution;
         #    skip if it doesn't exist yet — fields will be set at instantiation)
         if manifest.is_file():
             update_manifest(manifest, showroom_type, infrastructure)
 
-        # 4. Remove .scaffolds/
+        # 5. Remove .scaffolds/
         shutil.rmtree(scaffold_dir)
 
     except OSError as exc:

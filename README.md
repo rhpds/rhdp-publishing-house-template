@@ -33,17 +33,25 @@ Run `python scaffold.py --help` for non-interactive usage.
 
 ## Structure
 
+Before scaffolding, the repo only has:
+
 - `scaffold.py` — Lab pattern scaffolding script (run once after cloning)
-- `.scaffolds/` — Pattern-specific files (removed after scaffolding)
+- `.scaffolds/` — Common and pattern-specific files (removed after scaffolding)
+- `publishing-house/` — Project state (manifest), specs, reviews, decisions
+- `hooks/` — Claude Code hooks
+
+### After Scaffolding
+
+Common to every pattern:
+
 - `content/` — Showroom AsciiDoc content (Antora modules)
 - `qa-automation/` — Health check and e2e test playbooks
 - `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080)
-- `publishing-house/` — Project state (manifest), specs, reviews, decisions
+
+Pattern-specific:
+
 - `site.yml` — Antora playbook (open patterns use `rhdp_showroom_theme`; guided patterns use `nookbag-bundle`)
 - `ui-config.yml` — Showroom UI layout config (set by scaffold, customize tabs afterward)
-
-### After Scaffolding (pattern-specific)
-
 - `runtime-automation/` — Per-module solve/validate playbooks (Guided patterns)
 - `setup-automation/` — Environment setup playbook (ZT Guided only)
 - `config/` — Project Zero instance, network, and firewall definitions (ZT Guided only)

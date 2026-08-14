@@ -2,6 +2,7 @@ version: "3.0"
 services:
   antora:
     image: quay.io/rhpds/antora:v1.3.0
+    user: "0:0"
     environment:
       - WAIT_FOR_GIT_CLONER=false
       - ANTORA_ENABLE_DEV_MODE=true

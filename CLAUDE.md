@@ -12,11 +12,16 @@ Read it first every session.
 
 ## Scaffolding
 Run `python scaffold.py` after cloning to select a lab pattern (AgD v2 Open,
-AgD v2 Guided, or ZT Guided). The script copies pattern-specific stubs into the
-project root (including `ui-config.yml` and, for guided patterns, `site.yml` with
-the nookbag UI bundle), sets `showroom_type` and `infrastructure` in the spec,
-and removes `.scaffolds/`. The orchestrator calls `scaffold.py --pattern <name> --force`
-during intake.
+AgD v2 Guided, or ZT Guided). The script copies common project files
+(`content/` with a minimal `antora.yml`/`nav.adoc`/`index.adoc`, `qa-automation/`,
+and a default `site.yml` using the `rhdp_showroom_theme` bundle — all shared by
+every pattern) plus pattern-specific stubs into the project root (including
+`ui-config.yml` and, for guided patterns, a `site.yml` that overwrites the
+default with the nookbag UI bundle), sets `showroom_type` and `infrastructure`
+in the spec, and removes `.scaffolds/`. `podman-compose.yaml` is AgD v2 Open
+only — guided patterns rely on Nookbag to drive navigation, so plain
+Antora + httpd can't preview them locally. The orchestrator calls
+`scaffold.py --pattern <name> --force` during intake.
 
 ## Content
 Showroom AsciiDoc content lives in [content/](content/). The Antora component descriptor

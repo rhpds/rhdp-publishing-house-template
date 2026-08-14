@@ -23,6 +23,15 @@ only — guided patterns rely on Nookbag to drive navigation, so plain
 Antora + httpd can't preview them locally. The orchestrator calls
 `scaffold.py --pattern <name> --force` during intake.
 
+Pass `--automation {ansible,gitops,both}` in the same invocation to also scaffold
+`automation/` from `.scaffolds/automation/` — this must happen before `.scaffolds/`
+is removed, so it can't be done as a separate later step once the project has already
+been scaffolded once. Add `--topology shared-cluster` (only known once intake completes)
+to additionally include `automation/gitops/bootstrap-tenant/`; without it, gitops automation
+only creates `automation/gitops/bootstrap-infra/`. The orchestrator calls
+`scaffold.py --pattern <name> --automation <automation_type> --force` during intake,
+reading `automation_type` from `publishing-house/spec.yaml`.
+
 ## Content
 Showroom AsciiDoc content lives in [content/](content/). The Antora component descriptor
 is at `content/antora.yml` and modules are in `content/modules/ROOT/pages/`.
@@ -37,6 +46,15 @@ Pattern-specific automation directories are created by `scaffold.py`:
 Common to all patterns:
 
 - `qa-automation/` — Health check and e2e test playbooks
+
+If `--automation` was passed to `scaffold.py`, it also creates `automation/`
+(source: `automation_type` in the spec):
+
+- `automation/ansible/` — Starter Ansible collection (`ansible`/`both`) — a placeholder;
+  build custom automation here (RHDPCD-110)
+- `automation/gitops/bootstrap-infra/` — Helm chart with a test namespace (`gitops`/`both`)
+- `automation/gitops/bootstrap-tenant/` — Per-user namespace + RBAC (`gitops`/`both`, only if
+  `--topology shared-cluster` was passed)
 
 ## Architecture
 

@@ -22,6 +22,12 @@ PATTERN_DIRS = [
     Path("config"),
 ]
 
+AUTOMATION_DIR = Path("automation")
+AUTOMATION_SCAFFOLD_DIR = SCAFFOLD_DIR / "automation"
+
+AUTOMATION_TYPES = ["ansible", "gitops", "both"]
+TOPOLOGIES = ["shared-cluster", "per-student", "cnv-pool"]
+
 PATTERNS: dict[str, tuple[str, str]] = {
     #  pattern-name   : (showroom_type, infrastructure)
     "agd-open":   ("classic", "agd_v2"),
@@ -60,6 +66,20 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print what would be done without touching the filesystem",
     )
+    parser.add_argument(
+        "--automation",
+        choices=AUTOMATION_TYPES,
+        default=None,
+        help="Automation type to scaffold from `.scaffolds/automation/` into `automation/` "
+             "(omit to skip automation scaffolding)",
+    )
+    parser.add_argument(
+        "--topology",
+        choices=TOPOLOGIES,
+        default=None,
+        help="Cluster topology — only affects gitops/both automation, where "
+             "`shared-cluster` also copies bootstrap-tenant/",
+    )
     return parser
 
 
@@ -96,7 +116,34 @@ def update_manifest(path: Path, showroom_type: str, infrastructure: str) -> None
     path.write_text(text, encoding="utf-8")
 
 
-def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
+def automation_copy_pairs(automation: str, topology: str | None) -> list[tuple[Path, Path]]:
+    """Resolve which `.scaffolds/automation/` subdirectories to copy for an automation type.
+
+    Returns (source, dest) pairs — both relative to `.scaffolds/automation/` and `automation/`
+    respectively; the layouts mirror each other (`gitops/bootstrap-infra/`,
+    `gitops/bootstrap-tenant/`, `ansible/`). `bootstrap-tenant/` is only included when topology
+    is `shared-cluster`; topology is usually unknown at initial scaffold time (it's decided later
+    during intake), so it's opt-in via `--topology`.
+    """
+    pairs: list[tuple[Path, Path]] = []
+    if automation in ("ansible", "both"):
+        pairs.append((Path("ansible"), Path("ansible")))
+    if automation in ("gitops", "both"):
+        pairs.append((Path("gitops/bootstrap-infra"), Path("gitops/bootstrap-infra")))
+        if topology == "shared-cluster":
+            pairs.append((Path("gitops/bootstrap-tenant"), Path("gitops/bootstrap-tenant")))
+    return pairs
+
+
+def scaffold(
+    root: Path,
+    pattern: str,
+    *,
+    force: bool,
+    dry_run: bool,
+    automation: str | None = None,
+    topology: str | None = None,
+) -> int:
     """Run the scaffolding process.  Returns 0 on success, 1 on error."""
     scaffold_dir = root / SCAFFOLD_DIR
     common_src = root / COMMON_DIR
@@ -130,8 +177,21 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
 
     showroom_type, infrastructure = PATTERNS[pattern]
 
-    # --- Check for existing pattern dirs ---
-    existing = [d for d in PATTERN_DIRS if (root / d).is_dir()]
+    automation_src = root / AUTOMATION_SCAFFOLD_DIR
+    automation_pairs: list[tuple[Path, Path]] = []
+    if automation:
+        automation_pairs = automation_copy_pairs(automation, topology)
+        missing = [src for src, _dest in automation_pairs if not (automation_src / src).is_dir()]
+        if missing:
+            names = ", ".join(str(automation_src / m) for m in missing)
+            print(f"Error: Automation source(s) not found: {names}.", file=sys.stderr)
+            return 1
+
+    # --- Check for existing pattern/automation dirs ---
+    dirs_to_check = list(PATTERN_DIRS)
+    if automation_pairs:
+        dirs_to_check.append(AUTOMATION_DIR)
+    existing = [d for d in dirs_to_check if (root / d).is_dir()]
     if existing and not force:
         if dry_run:
             print(f"Would remove existing directories: {', '.join(str(d) for d in existing)}")
@@ -163,6 +223,10 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         print(f"  Copy from {pattern_src}/:")
         for f in files:
             print(f"    → {f}")
+        if automation_pairs:
+            print(f"  Copy from {automation_src}/:")
+            for src, dest in automation_pairs:
+                print(f"    {src} → {AUTOMATION_DIR / dest}")
         if manifest.is_file():
             print(f"  Update {manifest}: showroom_type={showroom_type!r}, infrastructure={infrastructure!r}")
         else:
@@ -173,8 +237,8 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
 
     # --- Execute ---
     try:
-        # 1. Remove any existing pattern-specific directories
-        for d in PATTERN_DIRS:
+        # 1. Remove any existing pattern-specific / automation directories
+        for d in dirs_to_check:
             target = root / d
             if target.is_dir():
                 shutil.rmtree(target)
@@ -186,12 +250,18 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
         # 3. Copy pattern-specific files into project root
         shutil.copytree(pattern_src, root, dirs_exist_ok=True)
 
-        # 4. Update manifest (spec.yaml is populated by skeleton substitution;
+        # 4. Copy automation files into automation/ (before .scaffolds/ is removed —
+        #    this must happen in the same run since automation_type is known up front
+        #    but topology usually isn't yet)
+        for src, dest in automation_pairs:
+            shutil.copytree(automation_src / src, root / AUTOMATION_DIR / dest, dirs_exist_ok=True)
+
+        # 5. Update manifest (spec.yaml is populated by skeleton substitution;
         #    skip if it doesn't exist yet — fields will be set at instantiation)
         if manifest.is_file():
             update_manifest(manifest, showroom_type, infrastructure)
 
-        # 5. Remove .scaffolds/
+        # 6. Remove .scaffolds/
         shutil.rmtree(scaffold_dir)
 
     except OSError as exc:
@@ -211,6 +281,9 @@ def scaffold(root: Path, pattern: str, *, force: bool, dry_run: bool) -> int:
     created = [d for d in PATTERN_DIRS if (root / d).is_dir()]
     if created:
         print(f"  created:        {', '.join(str(d) for d in created)}")
+    if automation_pairs:
+        automation_created = sorted(str(AUTOMATION_DIR / dest) for _src, dest in automation_pairs)
+        print(f"  automation:     {', '.join(automation_created)}")
     print(f"\nNext: run /rhdp-publishing-house to start intake, or edit files directly.")
     return 0
 
@@ -230,7 +303,14 @@ def main(argv: list[str] | None = None) -> int:
             print("\nAborted.")
             return 1
 
-    return scaffold(root, pattern, force=args.force, dry_run=args.dry_run)
+    return scaffold(
+        root,
+        pattern,
+        force=args.force,
+        dry_run=args.dry_run,
+        automation=args.automation,
+        topology=args.topology,
+    )
 
 
 if __name__ == "__main__":

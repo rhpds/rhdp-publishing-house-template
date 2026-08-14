@@ -11,11 +11,12 @@ guide for the full walkthrough, including how to wire it into an AgnosticV
 
 ## Before you use this
 
-1. Copy this directory into your project — conventionally `automation/ansible/`.
-   Do this **before** running `scaffold.py` at the template repo root, since
-   scaffolding removes the whole `.scaffolds/` directory. If you've already
-   scaffolded, pull this directory from the `rhdp-publishing-house-template`
-   repository directly.
+1. Run `scaffold.py --automation ansible` (or `--automation both` alongside GitOps)
+   at the template repo root — this copies this directory into your project as
+   `automation/ansible/` for you. Do this on your **first** `scaffold.py` run,
+   since scaffolding removes the whole `.scaffolds/` directory afterward. If
+   you've already scaffolded without the flag, pull this directory from the
+   `rhdp-publishing-house-template` repository directly instead.
 2. Edit `galaxy.yml` — replace `<your_namespace>`, `<your_collection_name>`, and
    the author line. These become the prefix for every role's fully qualified name
    (`<your_namespace>.<your_collection_name>.<role_name>`).

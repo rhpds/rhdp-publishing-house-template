@@ -188,9 +188,11 @@ def scaffold(
             return 1
 
     # --- Check for existing pattern/automation dirs ---
-    dirs_to_check = list(PATTERN_DIRS)
-    if automation_pairs:
-        dirs_to_check.append(AUTOMATION_DIR)
+    # Automation dirs are checked per top-level type (automation/ansible/, automation/gitops/)
+    # rather than the whole automation/ tree, so re-running for one type doesn't clobber a
+    # different type that's already in place.
+    automation_top_dirs = sorted({AUTOMATION_DIR / dest.parts[0] for _src, dest in automation_pairs})
+    dirs_to_check = list(PATTERN_DIRS) + automation_top_dirs
     existing = [d for d in dirs_to_check if (root / d).is_dir()]
     if existing and not force:
         if dry_run:

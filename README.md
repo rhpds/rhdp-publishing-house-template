@@ -29,7 +29,12 @@ The scaffold script (`scaffold.py`) configures this template for one of three la
 After scaffolding, edit `ui-config.yml` to configure tabs for your infrastructure target (terminals, OCP console, external URLs).
 See the [showroom-template](https://github.com/rhpds/showroom-template) branches for example tab configurations.
 
-Run `python scaffold.py --help` for non-interactive usage.
+Run `python scaffold.py --help` for non-interactive usage. Pass `--automation {ansible,gitops,both}`
+in the same invocation to also scaffold an `automation/` directory from `.scaffolds/automation/` —
+this must be done up front, since `.scaffolds/` is removed once scaffolding completes. Add
+`--topology shared-cluster` to additionally include `automation/gitops/bootstrap-tenant/` (per-user
+namespace + RBAC); omit it for single-tenant topologies, where only `automation/gitops/bootstrap-infra/`
+is created.
 
 ## Structure
 
@@ -55,3 +60,9 @@ Pattern-specific:
 - `runtime-automation/` — Per-module solve/validate playbooks (Guided patterns)
 - `setup-automation/` — Environment setup playbook (ZT Guided only)
 - `config/` — Project Zero instance, network, and firewall definitions (ZT Guided only)
+
+Only if `--automation` was passed to `scaffold.py`:
+
+- `automation/ansible/` — Starter Ansible collection (`ansible`/`both`)
+- `automation/gitops/bootstrap-infra/` — Helm chart with a test namespace (`gitops`/`both`)
+- `automation/gitops/bootstrap-tenant/` — Per-user namespace + RBAC (`gitops`/`both`, only with `--topology shared-cluster`)

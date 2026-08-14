@@ -38,6 +38,12 @@ Common to all patterns:
 
 - `qa-automation/` — Health check and e2e test playbooks
 
+A starter Ansible collection (one no-op `example` role) lives at
+`.scaffolds/automation/ansible/` for projects that need custom automation beyond
+the base infrastructure. Copy it out to `automation/ansible/` *before* running
+`scaffold.py` — scaffolding deletes `.scaffolds/` entirely — then see the
+[Custom Ansible Automation](https://rhpds.github.io/rhdp-publishing-house/user/custom-automation/) guide.
+
 ## Architecture
 
 - **project_id**: comes from `catalog-info.yaml` `metadata.name`

@@ -36,7 +36,10 @@ Run `python scaffold.py --help` for non-interactive usage.
 Before scaffolding, the repo only has:
 
 - `scaffold.py` — Lab pattern scaffolding script (run once after cloning)
-- `.scaffolds/` — Common and pattern-specific files (removed after scaffolding)
+- `.scaffolds/` — Common and pattern-specific files (removed after scaffolding).
+  Also includes an optional starter Ansible collection at
+  `.scaffolds/automation/ansible/` for custom automation — copy it out before
+  scaffolding if you need it.
 - `publishing-house/` — Project state (manifest), specs, reviews, decisions
 - `hooks/` — Claude Code hooks
 

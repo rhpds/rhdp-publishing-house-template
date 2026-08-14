@@ -33,17 +33,25 @@ Run `python scaffold.py --help` for non-interactive usage.
 
 ## Structure
 
+Before scaffolding, the repo only has:
+
 - `scaffold.py` — Lab pattern scaffolding script (run once after cloning)
-- `.scaffolds/` — Pattern-specific files (removed after scaffolding)
-- `content/` — Showroom AsciiDoc content (Antora modules)
-- `qa-automation/` — Health check and e2e test playbooks
-- `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080)
+- `.scaffolds/` — Common and pattern-specific files (removed after scaffolding)
 - `publishing-house/` — Project state (manifest), specs, reviews, decisions
-- `site.yml` — Antora playbook (open patterns use `rhdp_showroom_theme`; guided patterns use `nookbag-bundle`)
+- `hooks/` — Claude Code hooks
+
+### After Scaffolding
+
+Common to every pattern:
+
+- `content/` — Showroom AsciiDoc content (Antora modules), pre-populated with a minimal `antora.yml`, `nav.adoc`, and `index.adoc`
+- `qa-automation/` — Health check and e2e test playbooks
+- `site.yml` — Antora playbook. Defaults to the `rhdp_showroom_theme` bundle; guided patterns overwrite it with a `nookbag-bundle` version
+
+Pattern-specific:
+
 - `ui-config.yml` — Showroom UI layout config (set by scaffold, customize tabs afterward)
-
-### After Scaffolding (pattern-specific)
-
+- `podman-compose.yaml` — Local dev preview (`podman compose up`, then http://localhost:8080). AgD v2 Open only — guided patterns rely on Nookbag to drive navigation and aren't previewable via plain Antora + httpd
 - `runtime-automation/` — Per-module solve/validate playbooks (Guided patterns)
 - `setup-automation/` — Environment setup playbook (ZT Guided only)
 - `config/` — Project Zero instance, network, and firewall definitions (ZT Guided only)

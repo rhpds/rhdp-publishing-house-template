@@ -1,4 +1,4 @@
-# `<your_collection_name>`
+# `automation`
 
 Starter Ansible collection for this project's custom automation — the base to build your
 own roles on top of. It ships with a single no-op `example` role (`roles/example/`) so
@@ -17,9 +17,14 @@ guide for the full walkthrough, including how to wire it into an AgnosticV
    since scaffolding removes the whole `.scaffolds/` directory afterward. If
    you've already scaffolded without the flag, pull this directory from the
    `rhdp-publishing-house-template` repository directly instead.
-2. Edit `galaxy.yml` — replace `<your_namespace>`, `<your_collection_name>`, and
-   the author line. These become the prefix for every role's fully qualified name
-   (`<your_namespace>.<your_collection_name>.<role_name>`).
+2. `galaxy.yml`'s `namespace` and `authors` still need real values — the
+   `config-helper` skill fills these in automatically right after scaffolding
+   (derived from your repo name and project owner). If you're not going through
+   that skill, edit `galaxy.yml` yourself: replace `<your_namespace>` and the
+   author line. `namespace` becomes the prefix for every role's fully qualified
+   name (`<your_namespace>.automation.<role_name>`) — see
+   [ansible-conventions.md](https://github.com/rhpds/rhdp-publishing-house-skills/blob/main/skills/development/references/ansible-conventions.md)
+   for the exact naming rules.
 3. Rename or remove `roles/example/` and add your own roles under `roles/`.
 4. Commit, then tag a release once it's ready to be consumed
    (`git tag v1.0.0 && git push --tags`).
@@ -54,7 +59,7 @@ Then reference it by its fully qualified name once the collection is installed:
 ```yaml
 - name: Run my_role_name
   ansible.builtin.include_role:
-    name: <your_namespace>.<your_collection_name>.my_role_name
+    name: <your_namespace>.automation.my_role_name
 ```
 
 ## Testing locally

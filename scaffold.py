@@ -14,7 +14,6 @@ from pathlib import Path
 SCAFFOLD_DIR = Path(".scaffolds")
 COMMON_DIR = SCAFFOLD_DIR / "common"
 MANIFEST = Path("publishing-house/spec.yaml")
-UI_CONFIG = Path("ui-config.yml")
 
 PATTERN_DIRS = [
     Path("runtime-automation"),
@@ -116,14 +115,18 @@ def update_manifest(path: Path, showroom_type: str, infrastructure: str) -> None
     path.write_text(text, encoding="utf-8")
 
 
-def automation_copy_pairs(automation: str, topology: str | None) -> list[tuple[Path, Path]]:
+def automation_copy_pairs(
+    automation: str, topology: str | None
+) -> list[tuple[Path, Path]]:
     """Resolve which `.scaffolds/automation/` subdirectories to copy for an automation type.
 
     Returns (source, dest) pairs — both relative to `.scaffolds/automation/` and `automation/`
     respectively; the layouts mirror each other (`gitops/bootstrap-infra/`,
-    `gitops/bootstrap-tenant/`, `ansible/`). `bootstrap-tenant/` is only included when topology
-    is `shared-cluster`; topology is usually unknown at initial scaffold time (it's decided later
-    during intake), so it's opt-in via `--topology`.
+    `gitops/bootstrap-tenant/`, `ansible/`).
+
+    `bootstrap-tenant/` is only included when topology is `shared-cluster`. Topology is usually
+    unknown at initial scaffold time — it's decided later during intake — so it's opt-in via
+    `--topology` rather than inferred.
     """
     pairs: list[tuple[Path, Path]] = []
     if automation in ("ansible", "both"):
@@ -149,7 +152,6 @@ def scaffold(
     common_src = root / COMMON_DIR
     pattern_src = scaffold_dir / pattern
     manifest = root / MANIFEST
-    ui_config = root / UI_CONFIG
 
     # --- Pre-flight checks ---
     if not scaffold_dir.is_dir():
@@ -177,6 +179,13 @@ def scaffold(
 
     showroom_type, infrastructure = PATTERNS[pattern]
 
+    if topology and automation not in ("gitops", "both"):
+        print(
+            f"Warning: --topology {topology!r} has no effect without "
+            "--automation gitops or --automation both (ignoring).",
+            file=sys.stderr,
+        )
+
     automation_src = root / AUTOMATION_SCAFFOLD_DIR
     automation_pairs: list[tuple[Path, Path]] = []
     if automation:
@@ -191,7 +200,9 @@ def scaffold(
     # Automation dirs are checked per top-level type (automation/ansible/, automation/gitops/)
     # rather than the whole automation/ tree, so re-running for one type doesn't clobber a
     # different type that's already in place.
-    automation_top_dirs = sorted({AUTOMATION_DIR / dest.parts[0] for _src, dest in automation_pairs})
+    automation_top_dirs = sorted(
+        {AUTOMATION_DIR / dest.parts[0] for _src, dest in automation_pairs}
+    )
     dirs_to_check = list(PATTERN_DIRS) + automation_top_dirs
     existing = [d for d in dirs_to_check if (root / d).is_dir()]
     if existing and not force:
@@ -230,7 +241,10 @@ def scaffold(
             for src, dest in automation_pairs:
                 print(f"    {src} → {AUTOMATION_DIR / dest}")
         if manifest.is_file():
-            print(f"  Update {manifest}: showroom_type={showroom_type!r}, infrastructure={infrastructure!r}")
+            print(
+                f"  Update {manifest}: "
+                f"showroom_type={showroom_type!r}, infrastructure={infrastructure!r}"
+            )
         else:
             print(f"  Skip {manifest} update (file not present yet)")
         print(f"  Remove {scaffold_dir}/")
@@ -269,8 +283,8 @@ def scaffold(
     except OSError as exc:
         print(f"Error during scaffolding: {exc}", file=sys.stderr)
         print(
-            f"The project may be in a partial state. "
-            f"Re-run with --force to attempt recovery.",
+            "The project may be in a partial state. "
+            "Re-run with --force to attempt recovery.",
             file=sys.stderr,
         )
         return 1
@@ -286,7 +300,7 @@ def scaffold(
     if automation_pairs:
         automation_created = sorted(str(AUTOMATION_DIR / dest) for _src, dest in automation_pairs)
         print(f"  automation:     {', '.join(automation_created)}")
-    print(f"\nNext: run /rhdp-publishing-house to start intake, or edit files directly.")
+    print("\nNext: run /rhdp-publishing-house to start intake, or edit files directly.")
     return 0
 
 

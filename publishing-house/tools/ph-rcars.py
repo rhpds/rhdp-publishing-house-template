@@ -96,6 +96,25 @@ def main():
                 status = result.get("status", "unknown")
                 if status not in ("pending", "running") or time.monotonic() >= deadline:
                     candidates = result.get("result", {}).get("candidates", [])
+                    for c in candidates:
+                        ci_name = c.get("ci_name", "")
+                        if not ci_name:
+                            continue
+                        try:
+                            cat_req = urllib.request.Request(
+                                f"{central}/api/v1/rcars/catalog/{urllib.request.quote(ci_name)}",
+                                headers=headers,
+                            )
+                            with urllib.request.urlopen(cat_req, context=ctx, timeout=15) as cr:
+                                item = json.loads(cr.read().decode())
+                            workloads = [
+                                {"role": w["workload_role"], "collection": w["workload_collection"]}
+                                for w in item.get("workloads", [])
+                            ]
+                            if workloads:
+                                c["workloads"] = workloads
+                        except Exception:
+                            pass
                     print(f"status:{status}")
                     print(f"candidates:{json.dumps(candidates)}")
                     break

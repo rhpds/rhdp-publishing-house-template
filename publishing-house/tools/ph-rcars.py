@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""RCARS advisor client. Submit a query or poll for results.
+"""RCARS advisor client. Submit a query, poll for results, or fetch catalog item details.
 
 Usage:
   python ph-rcars.py submit "A beginner workshop covering OpenShift that teaches deployment"
   python ph-rcars.py poll <job_id>
+  python ph-rcars.py catalog <ci_name>
 
 Submit output:
   job_id:abc-123
@@ -11,6 +12,11 @@ Submit output:
 Poll output:
   status:complete
   candidates:[{"display_name":"...","relevance_score":85,...}]
+
+Catalog output:
+  ci_name:LB1464
+  is_agd_v2:True
+  workloads:[{"workload_role":"...","workload_collection":"...","workload_fqcn":"..."}]
 """
 import json
 import os
@@ -100,8 +106,30 @@ def main():
                     break
             time.sleep(10)
 
+    elif action == "catalog":
+        if len(sys.argv) < 3:
+            print(json.dumps({"error": "Usage: ph-rcars.py catalog <ci_name>"}))
+            sys.exit(1)
+
+        ci_name = sys.argv[2]
+        try:
+            req = urllib.request.Request(
+                f"{central}/api/v1/rcars/catalog/{urllib.request.quote(ci_name)}",
+                headers=headers,
+            )
+            with urllib.request.urlopen(req, context=ctx, timeout=15) as r:
+                item = json.loads(r.read().decode())
+            workloads = item.get("workloads", [])
+            print(f"ci_name:{ci_name}")
+            print(f"is_agd_v2:{item.get('is_agd_v2', False)}")
+            print(f"workloads:{json.dumps(workloads)}")
+        except Exception as e:
+            print(f"ci_name:{ci_name}")
+            print(f"is_agd_v2:false")
+            print(f"workloads:[]")
+
     else:
-        print(json.dumps({"error": f"Unknown action: {action}. Use 'submit' or 'poll'."}))
+        print(json.dumps({"error": f"Unknown action: {action}. Use 'submit', 'poll', or 'catalog'."}))
         sys.exit(1)
 
 

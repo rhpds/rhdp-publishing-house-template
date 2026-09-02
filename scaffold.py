@@ -21,6 +21,12 @@ PATTERN_DIRS = [
     Path("config"),
 ]
 
+MIGRATION_SUFFIX = "-migration"
+
+# Files that document the scaffold source dir itself (not shippable project content) —
+# excluded when a `<pattern>-migration/` dir is overlaid onto the project root.
+MIGRATION_OVERLAY_IGNORE = shutil.ignore_patterns("README.md")
+
 AUTOMATION_DIR = Path("automation")
 AUTOMATION_SCAFFOLD_DIR = SCAFFOLD_DIR / "automation"
 
@@ -78,6 +84,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Cluster topology — only affects gitops/both automation, where "
              "`shared-cluster` also copies bootstrap-tenant/",
+    )
+    parser.add_argument(
+        "--migration",
+        action="store_true",
+        help="Migration mode — the project already has real content imported from a source "
+             "repo (content/, runtime-automation/, setup-automation/, config/, ui-config.yml). "
+             "Never overwrite existing files; only fill in what's missing from `common/` and "
+             "the pattern dir, then overlay `.scaffolds/<pattern>-migration/` (if present) on "
+             "top — e.g. this is what swaps in the legacy-script-aware qa-automation/ for "
+             "`zt-guided-migration`.",
     )
     return parser
 
@@ -138,6 +154,39 @@ def automation_copy_pairs(
     return pairs
 
 
+def plan_copy_no_overwrite(src: Path, dst: Path) -> tuple[list[Path], list[Path]]:
+    """Preview a no-overwrite copy of `src` into `dst`.
+
+    Returns `(to_copy, skipped_existing)` — file paths relative to `src`/`dst`. Files that
+    already exist at the destination are never touched; only genuinely missing files would
+    be copied.
+    """
+    to_copy: list[Path] = []
+    skipped: list[Path] = []
+    for item in sorted(src.rglob("*")):
+        if item.is_dir():
+            continue
+        rel = item.relative_to(src)
+        (skipped if (dst / rel).exists() else to_copy).append(rel)
+    return to_copy, skipped
+
+
+def copy_tree_no_overwrite(src: Path, dst: Path) -> list[Path]:
+    """Copy files from `src` into `dst`, skipping any file that already exists at `dst`.
+
+    Used in `--migration` mode so real, already-imported content (content/, runtime-automation/,
+    setup-automation/, config/, ui-config.yml, etc.) is never clobbered by placeholder stubs —
+    only genuinely missing files get filled in. Returns the list of paths actually copied
+    (relative to `src`/`dst`).
+    """
+    to_copy, _skipped = plan_copy_no_overwrite(src, dst)
+    for rel in to_copy:
+        target = dst / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src / rel, target)
+    return to_copy
+
+
 def scaffold(
     root: Path,
     pattern: str,
@@ -146,11 +195,13 @@ def scaffold(
     dry_run: bool,
     automation: str | None = None,
     topology: str | None = None,
+    migration: bool = False,
 ) -> int:
     """Run the scaffolding process.  Returns 0 on success, 1 on error."""
     scaffold_dir = root / SCAFFOLD_DIR
     common_src = root / COMMON_DIR
     pattern_src = scaffold_dir / pattern
+    migration_src = scaffold_dir / f"{pattern}{MIGRATION_SUFFIX}"
     manifest = root / MANIFEST
 
     # --- Pre-flight checks ---
@@ -186,6 +237,15 @@ def scaffold(
             file=sys.stderr,
         )
 
+    has_migration_overlay = migration_src.is_dir()
+    if migration and not has_migration_overlay:
+        print(
+            f"Note: --migration was passed but no `{migration_src}/` overlay exists for "
+            f"pattern {pattern!r} — no pattern-specific overlay will be applied. Existing "
+            "files are still preserved (no-overwrite fill-in only).",
+            file=sys.stderr,
+        )
+
     automation_src = root / AUTOMATION_SCAFFOLD_DIR
     automation_pairs: list[tuple[Path, Path]] = []
     if automation:
@@ -200,10 +260,14 @@ def scaffold(
     # Automation dirs are checked per top-level type (automation/ansible/, automation/gitops/)
     # rather than the whole automation/ tree, so re-running for one type doesn't clobber a
     # different type that's already in place.
+    #
+    # In migration mode, PATTERN_DIRS are never wiped (they hold real imported content), so
+    # they're excluded from this check entirely — only automation dirs are still subject to it.
     automation_top_dirs = sorted(
         {AUTOMATION_DIR / dest.parts[0] for _src, dest in automation_pairs}
     )
-    dirs_to_check = list(PATTERN_DIRS) + automation_top_dirs
+    pattern_dirs_to_wipe: list[Path] = [] if migration else list(PATTERN_DIRS)
+    dirs_to_check = pattern_dirs_to_wipe + automation_top_dirs
     existing = [d for d in dirs_to_check if (root / d).is_dir()]
     if existing and not force:
         if dry_run:
@@ -218,24 +282,38 @@ def scaffold(
 
     # --- Dry-run summary ---
     if dry_run:
-        print(f"\n--- Dry run: pattern={pattern} ---")
-        if common_src.is_dir():
-            common_files = sorted(
-                p.relative_to(common_src)
-                for p in common_src.rglob("*")
-                if p.is_file()
+        print(f"\n--- Dry run: pattern={pattern}{' (migration)' if migration else ''} ---")
+        if migration:
+            print(
+                "  Migration mode: existing files (content/, runtime-automation/, "
+                "setup-automation/, config/, ui-config.yml, etc.) are preserved — only "
+                "missing files are filled in from common/ and the pattern dir."
             )
-            print(f"  Copy from {common_src}/:")
-            for f in common_files:
-                print(f"    → {f}")
-        files = sorted(
-            p.relative_to(pattern_src)
-            for p in pattern_src.rglob("*")
-            if p.is_file()
-        )
-        print(f"  Copy from {pattern_src}/:")
-        for f in files:
-            print(f"    → {f}")
+        for label, src in (("common", common_src), (f"pattern ({pattern})", pattern_src)):
+            if not src.is_dir():
+                continue
+            if migration:
+                to_copy, skipped = plan_copy_no_overwrite(src, root)
+                print(f"  Fill in from {src}/ ({len(skipped)} already-existing files skipped):")
+                for f in to_copy:
+                    print(f"    → {f}")
+            else:
+                files = sorted(p.relative_to(src) for p in src.rglob("*") if p.is_file())
+                print(f"  Copy from {src}/:")
+                for f in files:
+                    print(f"    → {f}")
+        if migration:
+            if has_migration_overlay:
+                overlay_files = sorted(
+                    p.relative_to(migration_src)
+                    for p in migration_src.rglob("*")
+                    if p.is_file() and p.name != "README.md"
+                )
+                print(f"  Overlay (always overwrite) from {migration_src}/:")
+                for f in overlay_files:
+                    print(f"    → {f}")
+            else:
+                print(f"  No migration overlay at {migration_src}/ — skipping.")
         if automation_pairs:
             print(f"  Copy from {automation_src}/:")
             for src, dest in automation_pairs:
@@ -252,19 +330,40 @@ def scaffold(
         return 0
 
     # --- Execute ---
+    overlay_copied: list[Path] = []
     try:
-        # 1. Remove any existing pattern-specific / automation directories
+        # 1. Remove any existing pattern-specific / automation directories (skipped for
+        #    PATTERN_DIRS in migration mode — see dirs_to_check above)
         for d in dirs_to_check:
             target = root / d
             if target.is_dir():
                 shutil.rmtree(target)
 
         # 2. Copy common files (shared by every pattern) into project root
-        if common_src.is_dir():
-            shutil.copytree(common_src, root, dirs_exist_ok=True)
-
         # 3. Copy pattern-specific files into project root
-        shutil.copytree(pattern_src, root, dirs_exist_ok=True)
+        # In migration mode, never overwrite files that already exist (real imported content).
+        if migration:
+            if common_src.is_dir():
+                copy_tree_no_overwrite(common_src, root)
+            copy_tree_no_overwrite(pattern_src, root)
+        else:
+            if common_src.is_dir():
+                shutil.copytree(common_src, root, dirs_exist_ok=True)
+            shutil.copytree(pattern_src, root, dirs_exist_ok=True)
+
+        # 3b. Migration overlay — always overwrites. This is what swaps in the
+        #     migration-aware qa-automation/ (driving the legacy runtime-automation shell
+        #     scripts a migrated repo already ships) in place of whatever the no-overwrite
+        #     common/pattern copy just filled in above.
+        if migration and has_migration_overlay:
+            shutil.copytree(
+                migration_src, root, dirs_exist_ok=True, ignore=MIGRATION_OVERLAY_IGNORE
+            )
+            overlay_copied = sorted(
+                p.relative_to(migration_src)
+                for p in migration_src.rglob("*")
+                if p.is_file() and p.name != "README.md"
+            )
 
         # 4. Copy automation files into automation/ (before .scaffolds/ is removed —
         #    this must happen in the same run since automation_type is known up front
@@ -290,13 +389,16 @@ def scaffold(
         return 1
 
     # --- Summary ---
-    print(f"\nScaffolded: {pattern}")
+    print(f"\nScaffolded: {pattern}{' (migration)' if migration else ''}")
     print(f"  showroom_type:  {showroom_type}")
     print(f"  infrastructure: {infrastructure}")
 
-    created = [d for d in PATTERN_DIRS if (root / d).is_dir()]
-    if created:
-        print(f"  created:        {', '.join(str(d) for d in created)}")
+    existing_pattern_dirs = [d for d in PATTERN_DIRS if (root / d).is_dir()]
+    if existing_pattern_dirs:
+        label = "preserved:      " if migration else "created:        "
+        print(f"  {label}{', '.join(str(d) for d in existing_pattern_dirs)}")
+    if migration and overlay_copied:
+        print(f"  overlay:        {', '.join(str(f) for f in overlay_copied)}")
     if automation_pairs:
         automation_created = sorted(str(AUTOMATION_DIR / dest) for _src, dest in automation_pairs)
         print(f"  automation:     {', '.join(automation_created)}")
@@ -326,6 +428,7 @@ def main(argv: list[str] | None = None) -> int:
         dry_run=args.dry_run,
         automation=args.automation,
         topology=args.topology,
+        migration=args.migration,
     )
 
 

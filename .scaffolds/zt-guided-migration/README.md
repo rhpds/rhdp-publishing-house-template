@@ -1,22 +1,31 @@
 # zt-guided-migration
 
-This directory is **not** wired into `scaffold.py` — it does not appear in
-`PATTERNS`, the interactive menu, or `--pattern` choices. It exists purely as
-a source folder for a separate downstream process that migrates an existing
-Showroom/nookbag content repo into this Publishing House template.
+This directory is **not** in `PATTERNS` and never appears in the interactive menu or
+`--pattern` choices — it's not a pattern you scaffold directly. It's an **overlay** that
+`scaffold.py` applies on top of the `zt-guided` pattern when `--migration` is passed.
 
 ## Why this isn't a normal scaffold pattern
 
-The `zt-guided` pattern (see `.scaffolds/zt-guided/`) generates a fresh
-project with placeholder Ansible playbooks for `runtime-automation/`,
-`setup-automation/`, and `config/`. A repo being migrated already has all of
-that — including working `runtime-automation/<module>/{solve,validation}-<host>.sh`
-shell scripts and a populated `ui-config.yml` — so those stubs would only get
-overwritten or ignored.
+A migrated repo (`project.intake_type: migration`) already has real content imported from
+the source repo before `scaffold.py` ever runs — including working
+`runtime-automation/<module>/{solve,validation}-<host>.sh` shell scripts and a populated
+`ui-config.yml`. Blindly copying the `zt-guided` pattern's placeholder stubs on top of that
+would destroy it.
 
-What a migrated repo is missing is a `qa-automation/` that knows how to drive
-those legacy shell scripts (rather than the ansible-playbook-per-module style
-the fresh `zt-guided` scaffold assumes). That's all this directory provides.
+When `--migration` is passed, `scaffold.py`:
+
+1. Never wipes or overwrites `runtime-automation/`, `setup-automation/`, `config/`, or any
+   other already-existing file — it only fills in files that are genuinely missing from
+   `common/` and `zt-guided/`.
+2. After that fill-in pass, overlays this directory (`zt-guided-migration/`) on top,
+   **overwriting** whatever it touches. Today that's just `qa-automation/` — the one thing
+   a migrated repo doesn't already have in Publishing House's format, since it needs to
+   drive the legacy shell scripts (see below) rather than the ansible-playbook-per-module
+   style the fresh `zt-guided` scaffold assumes.
+
+`README.md` (this file) is excluded from the overlay — it documents the scaffold source
+itself and must never land in a scaffolded project's root, where it would clobber the
+real `README.md`.
 
 ## Contents
 
@@ -32,6 +41,13 @@ the fresh `zt-guided` scaffold assumes). That's all this directory provides.
 
 ## Usage
 
-The downstream migration process copies `qa-automation/` from this directory
-into the target repo's root, replacing the generic placeholder
-`qa-automation/` that ships with every other pattern.
+Invoked automatically as part of the normal `zt-guided` scaffold run:
+
+```bash
+python scaffold.py --pattern zt-guided --migration --force
+```
+
+This is what `config-helper` (in `rhdp-publishing-house-skills`) runs for a project with
+`project.intake_type: migration` and `project.showroom_type: zero_touch`. See
+`config-helper.md` Route A for the full flow, including the module-naming alignment step
+that runs immediately before this.

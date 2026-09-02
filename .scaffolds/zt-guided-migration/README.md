@@ -14,10 +14,17 @@ would destroy it.
 
 When `--migration` is passed, `scaffold.py`:
 
-1. Never wipes or overwrites `runtime-automation/`, `setup-automation/`, `config/`, or any
-   other already-existing file — it only fills in files that are genuinely missing from
-   `common/` and `zt-guided/`.
-2. After that fill-in pass, overlays this directory (`zt-guided-migration/`) on top,
+1. Never wipes or overwrites `runtime-automation/`, `setup-automation/`, or `config/` —
+   and, unlike other pattern files, these three are fully hands-off: they're never even
+   scanned for fill-in. A migrated repo structures them completely differently from the
+   fresh `zt-guided` scaffold (shell scripts in real `module-NN-<slug>/` folders, not
+   `module-01/{setup,solve,validate}.yml` ansible-playbook-per-module placeholders), so
+   "missing by filename" doesn't mean the placeholder stub belongs there — copying it in
+   would just leave an unused extra file/folder alongside the real automation.
+2. Everything else (e.g. `site.yml`, `ui-config.yml`) still only fills in files that are
+   genuinely missing from `common/` and `zt-guided/` — real, already-existing files are
+   never overwritten.
+3. After that fill-in pass, overlays this directory (`zt-guided-migration/`) on top,
    **overwriting** whatever it touches. Today that's just `qa-automation/` — the one thing
    a migrated repo doesn't already have in Publishing House's format, since it needs to
    drive the legacy shell scripts (see below) rather than the ansible-playbook-per-module

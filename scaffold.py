@@ -90,10 +90,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Migration mode — the project already has real content imported from a source "
              "repo (content/, runtime-automation/, setup-automation/, config/, ui-config.yml). "
-             "Never overwrite existing files; only fill in what's missing from `common/` and "
-             "the pattern dir, then overlay `.scaffolds/<pattern>-migration/` (if present) on "
-             "top — e.g. this is what swaps in the legacy-script-aware qa-automation/ for "
-             "`zt-guided-migration`.",
+             "Never overwrite existing files. runtime-automation/, setup-automation/, and "
+             "config/ are fully hands-off — never scanned for fill-in at all, since a migrated "
+             "repo structures them completely differently (shell scripts in real module "
+             "folders, not ansible-playbook-per-module placeholders). Other pattern files "
+             "(e.g. site.yml, ui-config.yml) still get filled in from `common/` and the "
+             "pattern dir if genuinely missing, then `.scaffolds/<pattern>-migration/` (if "
+             "present) is overlaid on top — e.g. this is what swaps in the "
+             "legacy-script-aware qa-automation/ for `zt-guided-migration`.",
     )
     return parser
 
@@ -154,12 +158,20 @@ def automation_copy_pairs(
     return pairs
 
 
-def plan_copy_no_overwrite(src: Path, dst: Path) -> tuple[list[Path], list[Path]]:
+def plan_copy_no_overwrite(
+    src: Path, dst: Path, exclude_dirs: set[str] | None = None
+) -> tuple[list[Path], list[Path]]:
     """Preview a no-overwrite copy of `src` into `dst`.
 
     Returns `(to_copy, skipped_existing)` — file paths relative to `src`/`dst`. Files that
     already exist at the destination are never touched; only genuinely missing files would
     be copied.
+
+    `exclude_dirs`, if given, is a set of top-level relative directory names (e.g.
+    `{"runtime-automation"}`) that are skipped entirely — not copied, not reported as
+    skipped, not touched at all. Used for dirs a migrated repo manages with its own,
+    completely different convention (e.g. shell scripts instead of ansible playbooks),
+    where "genuinely missing by filename" doesn't mean the scaffold stub is wanted.
     """
     to_copy: list[Path] = []
     skipped: list[Path] = []
@@ -167,19 +179,27 @@ def plan_copy_no_overwrite(src: Path, dst: Path) -> tuple[list[Path], list[Path]
         if item.is_dir():
             continue
         rel = item.relative_to(src)
+        if exclude_dirs and rel.parts[0] in exclude_dirs:
+            continue
         (skipped if (dst / rel).exists() else to_copy).append(rel)
     return to_copy, skipped
 
 
-def copy_tree_no_overwrite(src: Path, dst: Path) -> list[Path]:
+def copy_tree_no_overwrite(
+    src: Path, dst: Path, exclude_dirs: set[str] | None = None
+) -> list[Path]:
     """Copy files from `src` into `dst`, skipping any file that already exists at `dst`.
 
     Used in `--migration` mode so real, already-imported content (content/, runtime-automation/,
     setup-automation/, config/, ui-config.yml, etc.) is never clobbered by placeholder stubs —
     only genuinely missing files get filled in. Returns the list of paths actually copied
     (relative to `src`/`dst`).
+
+    `exclude_dirs` is forwarded to `plan_copy_no_overwrite()` — see its docstring. Pass the
+    `PATTERN_DIRS` names in `--migration` mode so those dirs are never touched at all, not just
+    protected from overwrite.
     """
-    to_copy, _skipped = plan_copy_no_overwrite(src, dst)
+    to_copy, _skipped = plan_copy_no_overwrite(src, dst, exclude_dirs)
     for rel in to_copy:
         target = dst / rel
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -268,6 +288,14 @@ def scaffold(
     )
     pattern_dirs_to_wipe: list[Path] = [] if migration else list(PATTERN_DIRS)
     dirs_to_check = pattern_dirs_to_wipe + automation_top_dirs
+
+    # In migration mode, PATTERN_DIRS (runtime-automation/, setup-automation/, config/) are
+    # author/migration-owned and structured completely differently from the fresh scaffold's
+    # stubs (shell scripts in real module folders vs. ansible-playbook-per-module placeholders).
+    # They're excluded from the no-overwrite fill-in entirely — not just protected from
+    # overwrite by filename, since "genuinely missing by filename" doesn't mean a placeholder
+    # stub is wanted there.
+    migration_exclude_dirs = {d.name for d in PATTERN_DIRS} if migration else None
     existing = [d for d in dirs_to_check if (root / d).is_dir()]
     if existing and not force:
         if dry_run:
@@ -289,11 +317,15 @@ def scaffold(
                 "setup-automation/, config/, ui-config.yml, etc.) are preserved — only "
                 "missing files are filled in from common/ and the pattern dir."
             )
+            print(
+                f"  {', '.join(sorted(migration_exclude_dirs))} are fully hands-off — never "
+                "scanned for fill-in at all, not just protected from overwrite."
+            )
         for label, src in (("common", common_src), (f"pattern ({pattern})", pattern_src)):
             if not src.is_dir():
                 continue
             if migration:
-                to_copy, skipped = plan_copy_no_overwrite(src, root)
+                to_copy, skipped = plan_copy_no_overwrite(src, root, migration_exclude_dirs)
                 print(f"  Fill in from {src}/ ({len(skipped)} already-existing files skipped):")
                 for f in to_copy:
                     print(f"    → {f}")
@@ -341,11 +373,12 @@ def scaffold(
 
         # 2. Copy common files (shared by every pattern) into project root
         # 3. Copy pattern-specific files into project root
-        # In migration mode, never overwrite files that already exist (real imported content).
+        # In migration mode, never overwrite files that already exist (real imported content),
+        # and never fill in PATTERN_DIRS at all — see migration_exclude_dirs above.
         if migration:
             if common_src.is_dir():
-                copy_tree_no_overwrite(common_src, root)
-            copy_tree_no_overwrite(pattern_src, root)
+                copy_tree_no_overwrite(common_src, root, migration_exclude_dirs)
+            copy_tree_no_overwrite(pattern_src, root, migration_exclude_dirs)
         else:
             if common_src.is_dir():
                 shutil.copytree(common_src, root, dirs_exist_ok=True)

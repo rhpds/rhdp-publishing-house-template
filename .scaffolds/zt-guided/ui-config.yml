@@ -12,6 +12,7 @@ antora:
 
 tabs:
   - name: ">_ terminal"
-    url: /wetty
+    path: /wetty
+    port: 443
   - name: Placeholder
     url: /placeholder
